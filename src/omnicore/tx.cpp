@@ -1584,17 +1584,17 @@ int CMPTransaction::logicMath_MetaDExCancelEcosystem()
 /** Tx 50 */
 int CMPTransaction::logicMath_CreatePropertyFixed()
 {
-    uint256 blockHash;
-    {
-        LOCK(cs_main);
+    //uint256 blockHash;
+    //{
+    //    LOCK(cs_main);
 
-        CBlockIndex* pindex = chainActive[block];
-        if (pindex == NULL) {
-            PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
-            return (PKT_ERROR_SP -20);
-        }
-        blockHash = pindex->GetBlockHash();
-    }
+    //    CBlockIndex* pindex = chainActive[block];
+    //    if (pindex == NULL) {
+    //        PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
+    //        return (PKT_ERROR_SP -20);
+    //    }
+    //    blockHash = pindex->GetBlockHash();
+    //}
 
     if (OMNI_PROPERTY_MSC != ecosystem && OMNI_PROPERTY_TMSC != ecosystem) {
         PrintToLog("%s(): rejected: invalid ecosystem: %d\n", __func__, (uint32_t) ecosystem);
@@ -1639,7 +1639,7 @@ int CMPTransaction::logicMath_CreatePropertyFixed()
     newSP.url.assign(url);
     newSP.data.assign(data);
     newSP.fixed = true;
-    newSP.creation_block = blockHash;
+    newSP.creation_block = _blockHash;
     newSP.update_block = newSP.creation_block;
 
     const uint32_t propertyId = _my_sps->putSP(ecosystem, newSP);

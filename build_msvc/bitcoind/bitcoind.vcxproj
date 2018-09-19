@@ -26,7 +26,7 @@
     <RootNamespace>bitcoind</RootNamespace>
     <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
     <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
-    <ProjectName>omnicored</ProjectName>
+    <ProjectName>bitcoind</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -90,6 +90,9 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <AdditionalLibraryDirectories>F:\Coins2018\Coins\omnicore-0.3.1-addmsvc\build_msvc\x64\Debug</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>XCOPY /e /s /y "C:\omni_test\omnicore-0.3.1-WithMsvcDll\build_msvc\x64\Debug\*.dll" "C:\Go\Projects\go\src\github.com\HcashOrg\hcwallet"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -155,6 +158,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\bitcoinApi.cpp" />
     <ClCompile Include="..\..\src\bitcoind.cpp" />
     <ClCompile Include="..\..\src\DllExport.cpp" />
     <ClCompile Include="..\..\src\omnicore\activation.cpp" />
@@ -229,7 +233,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\bitcoinApi.h" />
     <ClInclude Include="..\..\src\omnicore\errors.h" />
+    <ClInclude Include="..\..\src\omnicore\tx.h" />
   </ItemGroup>
   <Import Label="configTarget" Project="..\common.vcxproj" />
 </Project>

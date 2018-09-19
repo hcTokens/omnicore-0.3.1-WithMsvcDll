@@ -25,7 +25,7 @@
 #include <boost/thread.hpp>
 
 #include <stdio.h>
-
+//#include "createpayload.h"
 /* Introduction text for doxygen: */
 
 /*! \mainpage Developer documentation
@@ -182,42 +182,43 @@ int main(int argc, char* argv[])
     return (AppInit(argc, argv) ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 */
-
-int parse_cmdline(char* line, char*** argvp)
-{
-    char** argv = (char**)malloc(sizeof(char*));
-    int argc = 0;
-    while (*line != '\0') {
-        char quote = 0;
-        while (strchr("\t ", *line)) /* Skips white spaces */
-            line++;
-        if (!*line)
-            break;
-        argv = (char**)realloc(argv, (argc + 2) * sizeof(char*)); /* Starts a new parameter */
-        if (*line == '"') {
-            quote = '"';
-            line++;
-        }
-        argv[argc++] = line;
-    more:
-        while (*line && !strchr("\t ", *line))
-            line++;
-
-        if (line > argv[argc - 1] && line[-1] == quote) // End of quoted parameter
-            line[-1] = 0;
-        else if (*line && quote) { // Space within a quote
-
-            line++;
-            goto more;
-        } else // End of unquoted parameter
-            if (*line)
-            *line++ = 0;
-    }
-    argv[argc] = NULL;
-    *argvp = argv;
-    return argc;
-}
-
+//
+//int parse_cmdline(char* line, char*** argvp)
+//{
+//    char** argv = (char**)malloc(sizeof(char*));
+//    int argc = 0;
+//    while (*line != '\0') {
+//        char quote = 0;
+//        while (strchr("\t ", *line)) /* Skips white spaces */
+//            line++;
+//        if (!*line)
+//            break;
+//        argv = (char**)realloc(argv, (argc + 2) * sizeof(char*)); /* Starts a new parameter */
+//        if (*line == '"') {
+//            quote = '"';
+//            line++;
+//        }
+//        argv[argc++] = line;
+//    more:
+//        while (*line && !strchr("\t ", *line))
+//            line++;
+//
+//        if (line > argv[argc - 1] && line[-1] == quote) // End of quoted parameter
+//            line[-1] = 0;
+//        else if (*line && quote) { // Space within a quote
+//
+//            line++;
+//            goto more;
+//        } else // End of unquoted parameter
+//            if (*line)
+//            *line++ = 0;
+//    }
+//    argv[argc] = NULL;
+//    *argvp = argv;
+//    return argc;
+//}
+ 
+        /*
 //below add by ycj after 20180908
 typedef char* (*FunGoJsonCmdReq)(char*);
 FunGoJsonCmdReq gFunGoJsonCmdReq = NULL;
@@ -226,6 +227,30 @@ FunGoJsonCmdReq gFunGoJsonCmdReq = NULL;
 
 extern "C" __declspec(dllexport) char* JsonCmdReq(char* pcReq)
 {
+	
+	{"jsonrpc":"1.0","method":"omni_sendissuancefixed","params":["Tsk6gAJ7X9wjihFPo4nt5HHa9GNZysTyugn",2,1,0,"Companies","Bitcoin Mining","Quantum Miner","","","1000000"],"id":1}
+	
+	
+
+	UniValue valRequest;
+        if (!valRequest.read(pcReq))
+	{
+			if (!valRequest["method"].isNull())
+			{
+				std::string method = valRequest["method"].getValStr();
+				if (method == "omni_sendissuancefixed") 
+				{
+                     std::vector<unsigned char> payload = CreatePayload_IssuanceFixed(ecosystem, type, previousId, category, subcategory, name, url, data, amount);
+
+                     std::vector<unsigned char> vchData;
+                     std::vector<unsigned char> vchOmBytes = GetOmMarker();
+                     vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+                     vchData.insert(vchData.end(), payload.begin(), payload.end());
+				}
+			}
+
+	}
+     
     std::string strReq = std::string(pcReq);
     std::string strReply = HTTPReq_JSONRPC_Simple(strReq);
     static char acTemp[1024000];
@@ -268,3 +293,4 @@ extern "C" __declspec(dllexport) void OmniStart(char* pcArgs)
 }
 
 
+*/
