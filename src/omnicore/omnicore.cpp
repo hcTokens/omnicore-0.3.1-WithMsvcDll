@@ -1843,6 +1843,55 @@ bool mastercore_handler_tx(const CTransaction& tx, int nBlock, unsigned int idx,
     return fFoundTx;
 }
 
+
+bool mastercore_handler_payload(std::string fromAddr, std::string toAddr, uint256 txHash, int nBlock, unsigned int idx, std::string payload)
+{
+    LOCK(cs_tally);
+
+    if (!mastercoreInitialized) {
+        mastercore_init();
+    }
+
+    // clear pending, if any
+    // NOTE1: Every incoming TX is checked, not just MP-ones because:
+    // if for some reason the incoming TX doesn't pass our parser validation steps successfuly, I'd still want to clear pending amounts for that TX.
+    // NOTE2: Plus I wanna clear the amount before that TX is parsed by our protocol, in case we ever consider pending amounts in internal calculations.
+    PendingDelete(txHash);
+
+    // we do not care about parsing blocks prior to our waterline (empty blockchain defense)
+    if (nBlock < nWaterlineBlock)
+        return false;
+
+    CMPTransaction mp_obj;
+    mp_obj.unlockLogic();
+		
+   std::vector<unsigned char> vecPayload = ParseHex(payload);
+    mp_obj.Set(fromAddr, toAddr, (unsigned char*)&vecPayload[0], vecPayload.size(), 3);
+    mp_obj.interpret_Transaction();
+
+	bool fFoundTx = false;
+
+    int interp_ret = mp_obj.interpretPacket();
+    if (interp_ret)
+        PrintToLog("!!! interpretPacket() returned %d !!!\n", interp_ret);
+
+    // Only structurally valid transactions get recorded in levelDB
+    // PKT_ERROR - 2 = interpret_Transaction failed, structurally invalid payload
+    if (interp_ret != PKT_ERROR - 2) {
+        bool bValid = (0 <= interp_ret);
+        p_txlistdb->recordTX(txHash, bValid, nBlock, mp_obj.getType(), mp_obj.getNewAmount());
+        p_OmniTXDB->RecordTransaction(txHash, idx, interp_ret);
+    }
+    fFoundTx |= (interp_ret == 0);
+    
+    if (fFoundTx && msc_debug_consensus_hash_every_transaction) {
+        uint256 consensusHash = GetConsensusHash();
+        PrintToLog("Consensus hash for transaction %s: %s\n", txHash.GetHex(), consensusHash.GetHex());
+    }
+
+    return fFoundTx;
+}
+
 /**
  * Determines, whether it is valid to use a Class C transaction for a given payload size.
  *

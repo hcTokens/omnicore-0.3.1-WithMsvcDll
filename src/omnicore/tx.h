@@ -290,6 +290,17 @@ public:
         memcpy(&pkt, p, pkt_size);
     }
 
+	
+    /** Sets the given values. */
+    void Set(const std::string& s, const std::string& r, unsigned char* p, int size, int encodingClassIn)
+    {
+        sender = s;
+        receiver = r;
+        pkt_size = size < sizeof(pkt) ? size : sizeof(pkt); 
+        encodingClass = encodingClassIn;
+        memcpy(&pkt, p, pkt_size);
+    }
+
     /** Parses the packet or payload. */
     bool interpret_Transaction();
 

@@ -527,7 +527,7 @@ UniValue omni_sendissuancecrowdsale(const UniValue& params, bool fHelp)
 
 UniValue omni_sendissuancefixed(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 10)
+    if (fHelp || params.size() != 9)
         throw runtime_error(
             "omni_sendissuancefixed \"fromaddress\" ecosystem type previousid \"category\" \"subcategory\" \"name\" \"url\" \"data\" \"amount\"\n"
 
@@ -554,16 +554,16 @@ UniValue omni_sendissuancefixed(const UniValue& params, bool fHelp)
         );
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
-    uint8_t ecosystem = ParseEcosystem(params[1]);
-    uint16_t type = ParsePropertyType(params[2]);
-    uint32_t previousId = ParsePreviousPropertyId(params[3]);
-    std::string category = ParseText(params[4]);
-    std::string subcategory = ParseText(params[5]);
-    std::string name = ParseText(params[6]);
-    std::string url = ParseText(params[7]);
-    std::string data = ParseText(params[8]);
-    int64_t amount = ParseAmount(params[9], type);
+    uint8_t ecosystem = ParseEcosystem(params[0]);
+    uint16_t type = ParsePropertyType(params[1]);
+    uint32_t previousId = ParsePreviousPropertyId(params[2]);
+    std::string category = ParseText(params[3]);
+    std::string subcategory = ParseText(params[4]);
+
+    std::string name = ParseText(params[5]);
+    std::string url = ParseText(params[6]);
+    std::string data = ParseText(params[7]);
+    int64_t amount = ParseAmount(params[8], type);
 
     // perform checks
     RequirePropertyName(name);
@@ -571,21 +571,7 @@ UniValue omni_sendissuancefixed(const UniValue& params, bool fHelp)
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_IssuanceFixed(ecosystem, type, previousId, category, subcategory, name, url, data, amount);
 
-    // request the wallet build the transaction (and if needed commit it)
-    uint256 txid;
-    std::string rawHex;
-    int result = WalletTxBuilder(fromAddress, "", "", 0, payload, txid, rawHex, autoCommit);
-
-    // check error and return the txid (or raw hex depending on autocommit)
-    if (result != 0) {
-        throw JSONRPCError(result, error_str(result));
-    } else {
-        if (!autoCommit) {
-            return rawHex;
-        } else {
-            return txid.GetHex();
-        }
-    }
+	return HexStr(payload);
 }
 
 UniValue omni_sendissuancemanaged(const UniValue& params, bool fHelp)

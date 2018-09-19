@@ -2429,6 +2429,40 @@ UniValue omni_getbalanceshash(const UniValue& params, bool fHelp)
     return response;
 }
 
+
+UniValue omni_dealopreturn(const UniValue& params, bool fHelp)
+{
+	int len = params.size();
+
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "omni_dealopreturn\n"
+            "\nReturns success or fail\n"
+            "\nArguments:\n"
+            "1. propertyid                  (number, required) the property to hash balances for\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"payload\" : \"string\",    (string) op_return script\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("omni_dealopreturn", "000000fff3d3322faddd"));
+
+    LOCK(cs_main);
+
+	std::string payload = ParseText(params[0]);
+    CMPTransaction transaction;	
+    const std::string fromAddr = "fromaddr";
+    const std::string toAddr = "toaddr";
+
+	uint256 hash;
+    int nBlock = 0;
+
+	mastercore_handler_payload(fromAddr, toAddr, hash,nBlock,1,payload);
+
+    return payload;
+}
+
 static const CRPCCommand commands[] =
 { //  category                             name                            actor (function)               okSafeMode
   //  ------------------------------------ ------------------------------- ------------------------------ ----------
@@ -2460,6 +2494,7 @@ static const CRPCCommand commands[] =
     { "omni layer (data retrieval)", "omni_getfeedistribution",        &omni_getfeedistribution,         false },
     { "omni layer (data retrieval)", "omni_getfeedistributions",       &omni_getfeedistributions,        false },
     { "omni layer (data retrieval)", "omni_getbalanceshash",           &omni_getbalanceshash,            false },
+    { "omni layer (data retrieval)", "omni_dealopreturn",              &omni_dealopreturn,               false},
 #ifdef ENABLE_WALLET
     { "omni layer (data retrieval)", "omni_listtransactions",          &omni_listtransactions,           false },
     { "omni layer (data retrieval)", "omni_getfeeshare",               &omni_getfeeshare,                false },

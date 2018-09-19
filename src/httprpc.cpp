@@ -158,8 +158,7 @@ std::string HTTPReq_JSONRPC_Simple(const std::string& strReq) //add by ycj 20180
         UniValue valRequest;
         if (!valRequest.read(strReq)) //!valRequest.read(req->ReadBody()))
             throw JSONRPCError(RPC_PARSE_ERROR, "Parse error");
-
-
+		
         // singleton request
         if (valRequest.isObject()) {
             jreq.parse(valRequest);
