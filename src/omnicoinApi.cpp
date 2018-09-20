@@ -3,15 +3,9 @@
 
 extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
 {
-    /*
-	{"jsonrpc":"1.0","method":"omni_sendissuancefixed","params":["Tsk6gAJ7X9wjihFPo4nt5HHa9GNZysTyugn",2,1,0,"Companies","Bitcoin Mining","Quantum Miner","","","1000000"],"id":1}
-	
-	*/
-
 	UniValue root;
     if (root.read(pcReq))
 	{
-           
         if (!root["method"].isNull())
 		{
 			std::string method = root["method"].getValStr();
@@ -64,9 +58,39 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
                  mp_obj.Set(Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee);
 
                  mp_obj.interpretPacket();
+            } 
+			else if (method == "omni_listproperties"){
+                UniValue response(UniValue::VARR);
+                uint32_t nextSPID = mastercore::_my_sps->peekNextSPID(1);
+                for (uint32_t propertyId = 1; propertyId < nextSPID; propertyId++) {
+                    CMPSPInfo::Entry sp;
+                    if (mastercore::_my_sps->getSP(propertyId, sp)) {
+                        UniValue propertyObj(UniValue::VOBJ);
+                        propertyObj.push_back(Pair("propertyid", (uint64_t)propertyId));
+                        PropertyToJSON(sp, propertyObj); // name, category, subcategory, data, url, divisible
+
+                        response.push_back(propertyObj);
+                    }
+                }
+
+                uint32_t nextTestSPID = mastercore::_my_sps->peekNextSPID(2);
+                for (uint32_t propertyId = TEST_ECO_PROPERTY_1; propertyId < nextTestSPID; propertyId++) {
+                    CMPSPInfo::Entry sp;
+                    if (mastercore::_my_sps->getSP(propertyId, sp)) {
+                        UniValue propertyObj(UniValue::VOBJ);
+                        propertyObj.push_back(Pair("propertyid", (uint64_t)propertyId));
+                        PropertyToJSON(sp, propertyObj); // name, category, subcategory, data, url, divisible
+
+                        response.push_back(propertyObj);
+                    }
+                }
+                std::string ret = response.write();
+                static char buf[1024000] = {0};
+                memset(buf, 0, sizeof(char) * 1024000);
+                strncpy(buf, ret.c_str(), ret.size());
+                return buf;
             }
-			else 
-			{
+			else {
                 std::string strReq = std::string(pcReq);
                 std::string strReply = HTTPReq_JSONRPC_Simple(strReq);
                 static char acTemp[1024000];
@@ -77,11 +101,8 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
 
                 return acTemp;
             }
-			
 		}
-
 	} 
-
     return "";
 }
 

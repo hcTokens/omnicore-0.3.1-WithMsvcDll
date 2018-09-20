@@ -25,7 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnicore-cli", "bitcoin-cli
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitcoin-tx", "bitcoin-tx\bitcoin-tx.vcxproj", "{D3022AF6-AD33-4CE3-B358-87CB6A1B29CF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitcoind", "omnicoind\omnicoind.vcxproj", "{D4513DDF-6013-44DC-ADCC-12EAF6D1F038}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnicoind", "omnicored\omnicored.vcxproj", "{D4513DDF-6013-44DC-ADCC-12EAF6D1F038}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -136,10 +136,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		        SolutionGuid = {DA7D16A6-E5F0-45B3-B194-C3FE64F1BFCD}
-		                                SolutionGuid = {D0CAE2D0-8DB1-4A0B-80EE-800AA6C64323}
-		                        SolutionGuid = {2FB733C9-24CB-4BA5-A26B-F43DAD7996B7}
-		                SolutionGuid = {4ABD1207-9A90-4EC9-A8EB-203638A2605D}
 		SolutionGuid = {F668B3E1-6E48-4F68-AE55-86D7CC3F7507}
+		                SolutionGuid = {4ABD1207-9A90-4EC9-A8EB-203638A2605D}
+		                        SolutionGuid = {2FB733C9-24CB-4BA5-A26B-F43DAD7996B7}
+		                                SolutionGuid = {D0CAE2D0-8DB1-4A0B-80EE-800AA6C64323}
+		        SolutionGuid = {DA7D16A6-E5F0-45B3-B194-C3FE64F1BFCD}
 	EndGlobalSection
 EndGlobal

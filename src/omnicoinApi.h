@@ -7,6 +7,10 @@
 #include "omnicore/createpayload.h"
 #include "omnicore/omnicore.h"
 #include "omnicore/tx.h"
+#include "omnicore/sp.h"
+
+#include "omnicore/rpc.h"
+
 #include "univalue.h"
 #include "utilstrencodings.h"
 
