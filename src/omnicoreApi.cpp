@@ -1,4 +1,4 @@
-#include "omnicoinApi.h"
+#include "omnicoreApi.h"
 
 
 extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)

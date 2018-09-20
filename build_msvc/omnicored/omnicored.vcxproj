@@ -161,7 +161,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\omnicoinApi.cpp" />
+    <ClCompile Include="..\..\src\omnicoreApi.cpp" />
     <ClCompile Include="..\..\src\bitcoind.cpp" />
     <ClCompile Include="..\..\src\DllExport.cpp" />
     <ClCompile Include="..\..\src\omnicore\activation.cpp" />
@@ -236,7 +236,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\omnicoinApi.h" />
+    <ClInclude Include="..\..\src\omnicoreApi.h" />
     <ClInclude Include="..\..\src\omnicore\errors.h" />
     <ClInclude Include="..\..\src\omnicore\tx.h" />
   </ItemGroup>
