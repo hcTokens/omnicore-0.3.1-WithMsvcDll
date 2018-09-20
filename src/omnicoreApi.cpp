@@ -29,11 +29,11 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
 				std::vector<unsigned char> vchOmBytes = GetOmMarker();
 				vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
 				vchData.insert(vchData.end(), payload.begin(), payload.end());
-				std::string payLoad = HexStr(vchData.begin(), vchData.end());
+				std::string strReply = JSONRPCReply(HexStr(vchData.begin(), vchData.end()), NullUniValue, root["id"]);
 
 				static char buf[1024000] = {0};
                 memset(buf, 0, sizeof(char) * 1024000);
-                strncpy(buf, payLoad.c_str(), payLoad.size());
+				strncpy(buf, strReply.c_str(), strReply.size());
 				return buf;
             }
 			else if (method == "ProcessTx" )
@@ -58,6 +58,11 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
                  mp_obj.Set(Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee);
 
                  mp_obj.interpretPacket();
+				 std::string strReply = JSONRPCReply("", NullUniValue, root["id"]);
+                 static char buf[1024000] = {0};
+                 memset(buf, 0, sizeof(char) * 1024000);
+                 strncpy(buf, strReply.c_str(), strReply.size());
+                 return buf;
             } 
 			else if (method == "omni_listproperties"){
                 UniValue response(UniValue::VARR);
@@ -84,10 +89,28 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
                         response.push_back(propertyObj);
                     }
                 }
-                std::string ret = response.write();
+				std::string strReply = JSONRPCReply(response, NullUniValue, root["id"]);
+                //strReply = mastercore::SanitizeInvalidUTF8(strReply);
+
                 static char buf[1024000] = {0};
                 memset(buf, 0, sizeof(char) * 1024000);
-                strncpy(buf, ret.c_str(), ret.size());
+                strncpy(buf, strReply.c_str(), strReply.size());
+                return buf;
+            } else if (method == "omni_send") {
+                std::string strReply = JSONRPCReply(omni_send(root["params"], false), NullUniValue, root["id"]);
+                //strReply = mastercore::SanitizeInvalidUTF8(strReply);
+
+                static char buf[1024000] = {0};
+                memset(buf, 0, sizeof(char) * 1024000);
+                strncpy(buf, strReply.c_str(), strReply.size());
+                return buf;
+            } else if (method == "omni_getbalance") {
+                std::string strReply = JSONRPCReply(omni_getbalance(root["params"], false), NullUniValue, root["id"]);
+               //strReply = mastercore::SanitizeInvalidUTF8(strReply);
+
+                static char buf[1024000] = {0};
+                memset(buf, 0, sizeof(char) * 1024000);
+                strncpy(buf, strReply.c_str(), strReply.size());
                 return buf;
             }
 			else {

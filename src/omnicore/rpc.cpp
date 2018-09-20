@@ -764,7 +764,7 @@ UniValue omni_getbalance(const UniValue& params, bool fHelp)
             + HelpExampleRpc("omni_getbalance", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\", 1")
         );
 
-    std::string address = ParseAddress(params[0]);
+    std::string address = params[0].getValStr(); //ParseAddress(params[0]);
     uint32_t propertyId = ParsePropertyId(params[1]);
 
     RequireExistingProperty(propertyId);
