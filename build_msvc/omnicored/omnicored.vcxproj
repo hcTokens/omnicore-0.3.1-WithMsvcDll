@@ -91,7 +91,8 @@
       <AdditionalLibraryDirectories>F:\Coins2018\Coins\omnicore-0.3.1-addmsvc\build_msvc\x64\Debug</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY /e /s /y "C:\omni_test\omnicore-0.3.1-WithMsvcDll\build_msvc\x64\Debug\*.dll" "C:\Go\Projects\go\src\github.com\HcashOrg\hcwallet"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
