@@ -34,4 +34,6 @@ void InterruptREST();
  */
 void StopREST();
 
+std::string HTTPReq_JSONRPC_Simple(const std::string& strReq); //add by ycj 20180908
+
 #endif

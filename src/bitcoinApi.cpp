@@ -49,7 +49,7 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
                  std::string Reference = root["Reference"].get_str();
 
                  std::vector<unsigned char> vecTxHash = ParseHex(root["TxHash"].get_str());
-                 std::vector<unsigned char> vecBlockHash = ParseHex(root["BlockHash"].get_str());
+				 std::vector<unsigned char> vecBlockHash = ParseHex(root["BlockHash"].get_str());
 
                  INT64 Block = root["Block"].get_int64();
                  INT64 Idx = root["Idx"].get_int64();
@@ -64,6 +64,18 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
                  mp_obj.Set(Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee);
 
                  mp_obj.interpretPacket();
+            }
+			else 
+			{
+                std::string strReq = std::string(pcReq);
+                std::string strReply = HTTPReq_JSONRPC_Simple(strReq);
+                static char acTemp[1024000];
+                memset(acTemp, 0, sizeof(0));
+                strncpy(acTemp, strReply.c_str(), sizeof(acTemp) - 1);
+
+                printf("in C Reply acTemp=%s", acTemp);
+
+                return acTemp;
             }
 			
 		}
