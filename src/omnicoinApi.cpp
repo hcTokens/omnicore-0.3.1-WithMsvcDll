@@ -1,4 +1,4 @@
-#include "bitcoinApi.h"
+#include "omnicoinApi.h"
 
 
 extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
