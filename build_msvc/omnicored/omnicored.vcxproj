@@ -91,8 +91,7 @@
       <AdditionalLibraryDirectories>F:\Coins2018\Coins\omnicore-0.3.1-addmsvc\build_msvc\x64\Debug</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>XCOPY /e /s /y "..\x64\Debug\*.dll" "$(GOPATH)\src\github.com\HcashOrg\hcwallet"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

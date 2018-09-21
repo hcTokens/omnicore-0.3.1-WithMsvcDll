@@ -2463,6 +2463,42 @@ UniValue omni_dealopreturn(const UniValue& params, bool fHelp)
     return payload;
 }
 
+UniValue omni_processtx(const UniValue& params, bool fHelp)
+{
+	//Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee
+    int len = params.size();
+
+    if (fHelp || params.size() != 9)
+        throw runtime_error(
+            "omni_processtx\n"
+            "\nExamples:\n" +
+            HelpExampleCli("omni_processtx", "000000fff3d3322faddd"));
+
+    LOCK(cs_main);
+
+	CMPTransaction mp_obj;
+    std::string Sender = params[0].get_str();
+    std::string Reference = params[1].get_str();
+
+    std::vector<unsigned char> vecTxHash = ParseHex(params[2].get_str());
+    std::vector<unsigned char> vecBlockHash = ParseHex(params[3].get_str());
+
+    int64_t Block = params[4].get_int64();
+    int64_t Idx = params[5].get_int64();
+    std::string ScriptEncode = params[6].get_str();
+    std::vector<unsigned char> Script = ParseHex(ScriptEncode);
+    int64_t Fee = params[7].get_int64();
+    int64_t Time = params[8].get_int64();
+
+    mp_obj.unlockLogic();
+    mp_obj.Set(uint256(vecTxHash), Block, Idx, Time);
+    mp_obj.SetBlockHash(uint256(vecBlockHash));
+    mp_obj.Set(Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee);
+    mp_obj.interpretPacket();
+
+    return "";
+}
+
 static const CRPCCommand commands[] =
 { //  category                             name                            actor (function)               okSafeMode
   //  ------------------------------------ ------------------------------- ------------------------------ ----------
@@ -2495,6 +2531,7 @@ static const CRPCCommand commands[] =
     { "omni layer (data retrieval)", "omni_getfeedistributions",       &omni_getfeedistributions,        false },
     { "omni layer (data retrieval)", "omni_getbalanceshash",           &omni_getbalanceshash,            false },
     { "omni layer (data retrieval)", "omni_dealopreturn",              &omni_dealopreturn,               false},
+	{ "omni layer (data retrieval)", "omni_processtx",                 &omni_processtx,               false},
 #ifdef ENABLE_WALLET
     { "omni layer (data retrieval)", "omni_listtransactions",          &omni_listtransactions,           false },
     { "omni layer (data retrieval)", "omni_getfeeshare",               &omni_getfeeshare,                false },

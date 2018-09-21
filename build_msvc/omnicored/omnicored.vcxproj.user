@@ -3,6 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommandArguments>--testnet -u admin -P 123 --hcusername admin --walletpass 123 --hcpassword 123</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommand>C:\Go\Projects\go\src\github.com\HcashOrg\hcwallet\hcwallet.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(GOPATH)\src\github.com\HcashOrg\hcwallet\hcwallet.exe</LocalDebuggerCommand>
   </PropertyGroup>
 </Project>
