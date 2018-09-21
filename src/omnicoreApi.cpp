@@ -22,7 +22,7 @@ MYDLLAPI const char* JsonCmdReq(char* pcReq)
         if (!root["method"].isNull())
 		{
 			std::string method = root["method"].getValStr();
-			if (method == "omni_sendissuancefixed") 
+			/*if (method == "omni_sendissuancefixed") 
 			{
 			   if (root["params"].size() != 10)
 					return "";
@@ -49,7 +49,7 @@ MYDLLAPI const char* JsonCmdReq(char* pcReq)
                 strncpy(buf, payLoad.c_str(), payLoad.size());
 				return buf;
             }
-			else if (method == "ProcessTx" )
+			else */if (method == "ProcessTx" )
 			{
                  CMPTransaction mp_obj;
                  std::string Sender = root["Sender"].get_str();
@@ -72,7 +72,7 @@ MYDLLAPI const char* JsonCmdReq(char* pcReq)
 
                  mp_obj.interpretPacket();
             } 
-			else if (method == "omni_listproperties"){
+		/*	else if (method == "omni_listproperties"){
                 UniValue response(UniValue::VARR);
                 uint32_t nextSPID = mastercore::_my_sps->peekNextSPID(1);
                 for (uint32_t propertyId = 1; propertyId < nextSPID; propertyId++) {
@@ -103,6 +103,7 @@ MYDLLAPI const char* JsonCmdReq(char* pcReq)
                 strncpy(buf, ret.c_str(), ret.size());
                 return buf;
             }
+			*/
 			else {
                 std::string strReq = std::string(pcReq);
                 std::string strReply = HTTPReq_JSONRPC_Simple(strReq);
