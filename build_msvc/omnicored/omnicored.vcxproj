@@ -164,7 +164,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\omnicoreApi.cpp" />
     <ClCompile Include="..\..\src\bitcoind.cpp" />
-    <ClCompile Include="..\..\src\DllExport.cpp" />
     <ClCompile Include="..\..\src\omnicore\activation.cpp" />
     <ClCompile Include="..\..\src\omnicore\consensushash.cpp" />
     <ClCompile Include="..\..\src\omnicore\convert.cpp" />
