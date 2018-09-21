@@ -1,4 +1,5 @@
 #include "omnicoreApi.h"
+#include <vector>
 
 #ifdef _WIN32
 #ifdef MYDLL_IMPORTS
@@ -16,14 +17,20 @@ extern void PropertyToJSON(const CMPSPInfo::Entry& sProperty, UniValue& property
 
 MYDLLAPI const char* JsonCmdReq(char* pcReq)
 {
-    std::string strReply = HTTPReq_JSONRPC_Simple(pcReq);
-    static char acTemp[1024000 + 1];
-    memset(acTemp, 0, sizeof(char) * 1024001);
-    strncpy(acTemp, strReply.c_str(), strReply.size() < 1024000 ? strReply.size() : 1024000);
-	
-    printf("in C Reply acTemp=%s", acTemp);
-	
-    return acTemp;
+	std::string strReq = std::string(pcReq);
+    std::string strReply = HTTPReq_JSONRPC_Simple(strReq);
+    static char acTemp[512000];
+    if (strReply.size() < sizeof(acTemp)) {
+        memset(acTemp, 0, sizeof(acTemp));
+        strncpy(acTemp, strReply.c_str(), sizeof(acTemp) - 1);
+        return acTemp;
+    } else {
+        static std::vector<char> vReply;
+        vReply.resize(strReply.size() + 1);
+        std::copy(strReply.begin(), strReply.end(), vReply.begin());
+        return (&vReply[0]);
+    }
+
 }
 
 MYDLLAPI void SetCallback(unsigned int uiIndx, void* pGoJsonCmdReq)
