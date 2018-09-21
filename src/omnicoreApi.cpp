@@ -1,7 +1,20 @@
 #include "omnicoreApi.h"
 
+#ifdef _WIN32
+#ifdef MYDLL_IMPORTS
+#define MYDLLAPI extern "C" __declspec(dllimport)
+#else
+#define MYDLLAPI extern "C" __declspec(dllexport)
+#endif
+#else
+#define MYDLLAPI extern "C"
+#endif
 
-extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
+extern void PropertyToJSON(const CMPSPInfo::Entry& sProperty, UniValue& property_obj);
+
+
+
+MYDLLAPI const char* JsonCmdReq(char* pcReq)
 {
 	UniValue root;
     if (root.read(pcReq))
@@ -29,11 +42,11 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
 				std::vector<unsigned char> vchOmBytes = GetOmMarker();
 				vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
 				vchData.insert(vchData.end(), payload.begin(), payload.end());
-				std::string strReply = JSONRPCReply(HexStr(vchData.begin(), vchData.end()), NullUniValue, root["id"]);
+				std::string payLoad = HexStr(vchData.begin(), vchData.end());
 
 				static char buf[1024000] = {0};
                 memset(buf, 0, sizeof(char) * 1024000);
-				strncpy(buf, strReply.c_str(), strReply.size());
+                strncpy(buf, payLoad.c_str(), payLoad.size());
 				return buf;
             }
 			else if (method == "ProcessTx" )
@@ -45,12 +58,12 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
                  std::vector<unsigned char> vecTxHash = ParseHex(root["TxHash"].get_str());
 				 std::vector<unsigned char> vecBlockHash = ParseHex(root["BlockHash"].get_str());
 
-                 INT64 Block = root["Block"].get_int64();
-                 INT64 Idx = root["Idx"].get_int64();
+                 int64_t Block = root["Block"].get_int64();
+                 int64_t Idx = root["Idx"].get_int64();
                  std::string ScriptEncode = root["ScriptEncode"].get_str();
                  std::vector<unsigned char> Script = ParseHex(ScriptEncode);
-                 INT64 Time = root["Time"].get_int64();
-                 INT64 Fee = root["Fee"].get_int64();
+                 int64_t Time = root["Time"].get_int64();
+                 int64_t Fee = root["Fee"].get_int64();
 
                  mp_obj.unlockLogic();
                  mp_obj.Set(uint256(vecTxHash), Block, Idx, Time);
@@ -58,11 +71,6 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
                  mp_obj.Set(Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee);
 
                  mp_obj.interpretPacket();
-				 std::string strReply = JSONRPCReply("", NullUniValue, root["id"]);
-                 static char buf[1024000] = {0};
-                 memset(buf, 0, sizeof(char) * 1024000);
-                 strncpy(buf, strReply.c_str(), strReply.size());
-                 return buf;
             } 
 			else if (method == "omni_listproperties"){
                 UniValue response(UniValue::VARR);
@@ -89,28 +97,10 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
                         response.push_back(propertyObj);
                     }
                 }
-				std::string strReply = JSONRPCReply(response, NullUniValue, root["id"]);
-                //strReply = mastercore::SanitizeInvalidUTF8(strReply);
-
+                std::string ret = response.write();
                 static char buf[1024000] = {0};
                 memset(buf, 0, sizeof(char) * 1024000);
-                strncpy(buf, strReply.c_str(), strReply.size());
-                return buf;
-            } else if (method == "omni_send") {
-                std::string strReply = JSONRPCReply(omni_send(root["params"], false), NullUniValue, root["id"]);
-                //strReply = mastercore::SanitizeInvalidUTF8(strReply);
-
-                static char buf[1024000] = {0};
-                memset(buf, 0, sizeof(char) * 1024000);
-                strncpy(buf, strReply.c_str(), strReply.size());
-                return buf;
-            } else if (method == "omni_getbalance") {
-                std::string strReply = JSONRPCReply(omni_getbalance(root["params"], false), NullUniValue, root["id"]);
-               //strReply = mastercore::SanitizeInvalidUTF8(strReply);
-
-                static char buf[1024000] = {0};
-                memset(buf, 0, sizeof(char) * 1024000);
-                strncpy(buf, strReply.c_str(), strReply.size());
+                strncpy(buf, ret.c_str(), ret.size());
                 return buf;
             }
 			else {
@@ -129,7 +119,7 @@ extern "C" __declspec(dllexport) const char* JsonCmdReq(char* pcReq)
     return "";
 }
 
-extern "C" __declspec(dllexport) void SetCallback(unsigned int uiIndx, void* pGoJsonCmdReq)
+MYDLLAPI void SetCallback(unsigned int uiIndx, void* pGoJsonCmdReq)
 { //	now just set one callback function,other may add later
   /*
   gFunGoJsonCmdReq = (FunGoJsonCmdReq)pGoJsonCmdReq;
@@ -181,7 +171,7 @@ int parse_cmdline(char* line, char*** argvp)
 
 extern bool AppInit(int argc, char* argv[]);
 
-extern "C" __declspec(dllexport) void OmniStart(char* pcArgs)
+MYDLLAPI void OmniStart(char* pcArgs)
 {
   
     printf(" in OmniStart\n");

@@ -168,8 +168,8 @@ bool AppInit(int argc, char* argv[])
     return fRet;
 }
 
-/*
-int main(int argc, char* argv[])
+
+int main_actual(int argc, char* argv[])
 {
     SetupEnvironment();
 
@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
 
     return (AppInit(argc, argv) ? EXIT_SUCCESS : EXIT_FAILURE);
 }
-*/
+
 //
 //int parse_cmdline(char* line, char*** argvp)
 //{
@@ -217,6 +217,7 @@ int main(int argc, char* argv[])
 //    *argvp = argv;
 //    return argc;
 //}
+
  
         /*
 //below add by ycj after 20180908
