@@ -16,6 +16,7 @@
 #include "omnicore/sp.h"
 #include "omnicore/tx.h"
 #include "omnicore/wallettxbuilder.h"
+#include "dbtxlist.h"
 
 #include "init.h"
 #include "main.h"
@@ -1531,42 +1532,79 @@ UniValue omni_sendalert(const UniValue& params, bool fHelp)
     }
 }
 
-static const CRPCCommand commands[] =
-{ //  category                             name                            actor (function)               okSafeMode
-  //  ------------------------------------ ------------------------------- ------------------------------ ----------
-#ifdef ENABLE_WALLET
-    { "omni layer (transaction creation)", "omni_sendrawtx",               &omni_sendrawtx,               false },
-    { "omni layer (transaction creation)", "omni_send",                    &omni_send,                    false },
-    { "omni layer (transaction creation)", "omni_senddexsell",             &omni_senddexsell,             false },
-    { "omni layer (transaction creation)", "omni_senddexaccept",           &omni_senddexaccept,           false },
-    { "omni layer (transaction creation)", "omni_sendissuancecrowdsale",   &omni_sendissuancecrowdsale,   false },
-    { "omni layer (transaction creation)", "omni_sendissuancefixed",       &omni_sendissuancefixed,       false },
-    { "omni layer (transaction creation)", "omni_sendissuancemanaged",     &omni_sendissuancemanaged,     false },
-    { "omni layer (transaction creation)", "omni_sendtrade",               &omni_sendtrade,               false },
-    { "omni layer (transaction creation)", "omni_sendcanceltradesbyprice", &omni_sendcanceltradesbyprice, false },
-    { "omni layer (transaction creation)", "omni_sendcanceltradesbypair",  &omni_sendcanceltradesbypair,  false },
-    { "omni layer (transaction creation)", "omni_sendcancelalltrades",     &omni_sendcancelalltrades,     false },
-    { "omni layer (transaction creation)", "omni_sendsto",                 &omni_sendsto,                 false },
-    { "omni layer (transaction creation)", "omni_sendgrant",               &omni_sendgrant,               false },
-    { "omni layer (transaction creation)", "omni_sendrevoke",              &omni_sendrevoke,              false },
-    { "omni layer (transaction creation)", "omni_sendclosecrowdsale",      &omni_sendclosecrowdsale,      false },
-    { "omni layer (transaction creation)", "omni_sendchangeissuer",        &omni_sendchangeissuer,        false },
-    { "omni layer (transaction creation)", "omni_sendall",                 &omni_sendall,                 false },
-    { "omni layer (transaction creation)", "omni_sendenablefreezing",      &omni_sendenablefreezing,      false },
-    { "omni layer (transaction creation)", "omni_senddisablefreezing",     &omni_senddisablefreezing,     false },
-    { "omni layer (transaction creation)", "omni_sendfreeze",              &omni_sendfreeze,              false },
-    { "omni layer (transaction creation)", "omni_sendunfreeze",            &omni_sendunfreeze,            false },
-    { "hidden",                            "omni_senddeactivation",        &omni_senddeactivation,        true  },
-    { "hidden",                            "omni_sendactivation",          &omni_sendactivation,          false },
-    { "hidden",                            "omni_sendalert",               &omni_sendalert,               true  },
-    { "omni layer (transaction creation)", "omni_funded_send",             &omni_funded_send,             false },
-    { "omni layer (transaction creation)", "omni_funded_sendall",          &omni_funded_sendall,          false },
 
-    /* depreciated: */
-    { "hidden",                            "sendrawtx_MP",                 &omni_sendrawtx,               false },
-    { "hidden",                            "send_MP",                      &omni_send,                    false },
-    { "hidden",                            "sendtoowners_MP",              &omni_sendsto,                 false },
-    { "hidden",                            "trade_MP",                     &trade_MP,                     false },
+UniValue omni_readalltxhash(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "omni_sendalert \"fromaddress\" alerttype expiryvalue typecheck versioncheck \"message\"\n"
+            "\nCreates and broadcasts an Omni Core alert.\n"
+            "\nNote: Omni Core ignores alerts from unauthorized sources.\n"
+            "\nArguments:\n"
+            "1. fromaddress          (string, required) the address to send from\n"
+            "2. alerttype            (number, required) the alert type\n"
+            "3. expiryvalue          (number, required) the value when the alert expires (depends on alert type)\n"
+            "4. message              (string, required) the user-faced alert message\n"
+            "\nResult:\n"
+            "\"hash\"                  (string) the hex-encoded transaction hash\n"
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendalert", "") + HelpExampleRpc("omni_sendalert", ""));
+
+
+    std::vector<uint256> hashs = p_txlistdb->getMPTransactionHash();
+
+	std::string retStr;
+
+    for (int i = 0; ; i++) {
+        retStr += hashs[i].ToString();
+        if (i + 1 < hashs.size()) {
+            retStr += ":";
+        } else {
+            break;
+		}
+    }
+
+    return retStr;
+}
+
+static const CRPCCommand commands[] =
+    {
+        //  category                             name                            actor (function)               okSafeMode
+        //  ------------------------------------ ------------------------------- ------------------------------ ----------
+#ifdef ENABLE_WALLET
+        {"omni layer (transaction creation)", "omni_sendrawtx", &omni_sendrawtx, false},
+        {"omni layer (transaction creation)", "omni_send", &omni_send, false},
+        {"omni layer (transaction creation)", "omni_senddexsell", &omni_senddexsell, false},
+        {"omni layer (transaction creation)", "omni_senddexaccept", &omni_senddexaccept, false},
+        {"omni layer (transaction creation)", "omni_sendissuancecrowdsale", &omni_sendissuancecrowdsale, false},
+        {"omni layer (transaction creation)", "omni_sendissuancefixed", &omni_sendissuancefixed, false},
+        {"omni layer (transaction creation)", "omni_sendissuancemanaged", &omni_sendissuancemanaged, false},
+        {"omni layer (transaction creation)", "omni_sendtrade", &omni_sendtrade, false},
+        {"omni layer (transaction creation)", "omni_sendcanceltradesbyprice", &omni_sendcanceltradesbyprice, false},
+        {"omni layer (transaction creation)", "omni_sendcanceltradesbypair", &omni_sendcanceltradesbypair, false},
+        {"omni layer (transaction creation)", "omni_sendcancelalltrades", &omni_sendcancelalltrades, false},
+        {"omni layer (transaction creation)", "omni_sendsto", &omni_sendsto, false},
+        {"omni layer (transaction creation)", "omni_sendgrant", &omni_sendgrant, false},
+        {"omni layer (transaction creation)", "omni_sendrevoke", &omni_sendrevoke, false},
+        {"omni layer (transaction creation)", "omni_sendclosecrowdsale", &omni_sendclosecrowdsale, false},
+        {"omni layer (transaction creation)", "omni_sendchangeissuer", &omni_sendchangeissuer, false},
+        {"omni layer (transaction creation)", "omni_sendall", &omni_sendall, false},
+        {"omni layer (transaction creation)", "omni_sendenablefreezing", &omni_sendenablefreezing, false},
+        {"omni layer (transaction creation)", "omni_senddisablefreezing", &omni_senddisablefreezing, false},
+        {"omni layer (transaction creation)", "omni_sendfreeze", &omni_sendfreeze, false},
+        {"omni layer (transaction creation)", "omni_sendunfreeze", &omni_sendunfreeze, false},
+        {"hidden", "omni_senddeactivation", &omni_senddeactivation, true},
+        {"hidden", "omni_sendactivation", &omni_sendactivation, false},
+        {"hidden", "omni_sendalert", &omni_sendalert, true},
+        {"omni layer (transaction creation)", "omni_funded_send", &omni_funded_send, false},
+        {"omni layer (transaction creation)", "omni_funded_sendall", &omni_funded_sendall, false},
+        {"omni layer (transaction creation)", "omni_readalltxhash", &omni_readalltxhash, false},
+
+        /* depreciated: */
+        {"hidden", "sendrawtx_MP", &omni_sendrawtx, false},
+        {"hidden", "send_MP", &omni_send, false},
+        {"hidden", "sendtoowners_MP", &omni_sendsto, false},
+        {"hidden", "trade_MP", &trade_MP, false},
 #endif
 };
 

@@ -54,6 +54,7 @@ public:
     void printAll();
 
     bool isMPinBlockRange(int, int, bool);
+    std::vector<uint256> getMPTransactionHash();
 };
 
 namespace mastercore
