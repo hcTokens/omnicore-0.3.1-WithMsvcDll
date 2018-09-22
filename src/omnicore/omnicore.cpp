@@ -1843,25 +1843,24 @@ bool mastercore_handler_tx(const CTransaction& tx, int nBlock, unsigned int idx,
     return fFoundTx;
 }
 
-
-
 bool mastercore_handler_mptx(UniValue root)
 {
     LOCK(cs_tally);
 
     CMPTransaction mp_obj;
-    std::string Sender = root["Sender"].get_str();
-    std::string Reference = root["Reference"].get_str();
+    std::string Sender = root[0].get_str();
+    std::string Reference = root[1].get_str();
 
-    std::vector<unsigned char> vecTxHash = ParseHex(root["TxHash"].get_str());
-    std::vector<unsigned char> vecBlockHash = ParseHex(root["BlockHash"].get_str());
+    std::vector<unsigned char> vecTxHash = ParseHex(root[2].get_str());
+    std::vector<unsigned char> vecBlockHash = ParseHex(root[3].get_str());
 
-    INT64 Block = root["Block"].get_int64();
-    INT64 Idx = root["Idx"].get_int64();
-    std::string ScriptEncode = root["ScriptEncode"].get_str();
+    INT64 Block = root[4].get_int64();
+    INT64 Idx = root[5].get_int64();
+    std::string ScriptEncode = root[6].get_str();
     std::vector<unsigned char> Script = ParseHex(ScriptEncode);
-    INT64 Time = root["Time"].get_int64();
-    INT64 Fee = root["Fee"].get_int64();
+    INT64 Fee = root[7].get_int64();
+    INT64 Time = root[8].get_int64();
+  
 
     mp_obj.unlockLogic();
     mp_obj.Set(uint256(vecTxHash), Block, Idx, Time);
