@@ -169,6 +169,8 @@ void CheckWalletUpdate(bool forceUpdate = false);
 /** Used to notify that the number of tokens for a property has changed. */
 void NotifyTotalTokensChanged(uint32_t propertyId, int block);
 
+std::string PayLoadWrap(const std::vector<unsigned char>& payload);
+
 namespace mastercore
 {
 //! In-memory collection of all amounts for all addresses for all properties
