@@ -34,6 +34,7 @@
 #include "omnicore/version.h"
 #include "omnicore/walletfetchtxs.h"
 #include "omnicore/walletutils.h"
+#include "omnicore/pending.h"
 
 #include "amount.h"
 #include "base58.h"
@@ -2476,6 +2477,8 @@ UniValue omni_processtx(const UniValue& params, bool fHelp)
 
     LOCK(cs_main);
 
+	
+
 	CMPTransaction mp_obj;
     std::string Sender = params[0].get_str();
     std::string Reference = params[1].get_str();
@@ -2489,6 +2492,10 @@ UniValue omni_processtx(const UniValue& params, bool fHelp)
     std::vector<unsigned char> Script = ParseHex(ScriptEncode);
     int64_t Fee = params[7].get_int64();
     int64_t Time = params[8].get_int64();
+
+	printf("omni_processtx %d txhash = %I64d      0000000000000000000000000\n", uint256(vecTxHash).GetCheapHash());
+
+	PendingDelete(uint256(vecTxHash));
 
     mp_obj.unlockLogic();
     mp_obj.Set(uint256(vecTxHash), Block, Idx, Time);

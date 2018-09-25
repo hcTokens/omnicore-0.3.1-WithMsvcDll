@@ -1,13 +1,13 @@
 #include "omnicoreApi.h"
 
 #ifdef _WIN32
-#ifdef MYDLL_IMPORTS
-#define MYDLLAPI extern "C" __declspec(dllimport)
+	#ifdef MYDLL_IMPORTS
+	#define MYDLLAPI extern "C" __declspec(dllimport)
+	#else
+	#define MYDLLAPI extern "C" __declspec(dllexport)
+	#endif
 #else
-#define MYDLLAPI extern "C" __declspec(dllexport)
-#endif
-#else
-#define MYDLLAPI extern "C"
+	#define MYDLLAPI extern "C"	
 #endif
 
 extern void PropertyToJSON(const CMPSPInfo::Entry& sProperty, UniValue& property_obj);

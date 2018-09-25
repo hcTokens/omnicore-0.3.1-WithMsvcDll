@@ -19,10 +19,12 @@
 #include "utilstrencodings.h"
 
 #include "omnicore/utilsui.h"
+#include "omnicore/omnicore.h"
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
+#include "rpc/register.h"
 
 #include <stdio.h>
 //#include "createpayload.h"
@@ -64,6 +66,17 @@ void WaitForShutdown(boost::thread_group* threadGroup)
 //
 bool AppInit(int argc, char* argv[])
 {
+#if 1
+	if (!boost::filesystem::is_directory(GetDataDir(false))) {
+		return false;
+    }
+	SelectParams("regtest");
+
+	RegisterAllCoreRPCCommands(tableRPC);
+	SetRPCWarmupFinished();
+	mastercore_init_ex();
+	return true;
+#endif
     boost::thread_group threadGroup;
     CScheduler scheduler;
 

@@ -31,12 +31,13 @@ void RegisterOmniRawTransactionRPCCommands(CRPCTable &tableRPC);
 
 static inline void RegisterAllCoreRPCCommands(CRPCTable &tableRPC)
 {
+	/*
     RegisterBlockchainRPCCommands(tableRPC);
     RegisterNetRPCCommands(tableRPC);
     RegisterMiscRPCCommands(tableRPC);
     RegisterMiningRPCCommands(tableRPC);
     RegisterRawTransactionRPCCommands(tableRPC);
-
+	*/
     /* Omni Core RPCs: */
     RegisterOmniDataRetrievalRPCCommands(tableRPC);
     RegisterOmniTransactionCreationRPCCommands(tableRPC);

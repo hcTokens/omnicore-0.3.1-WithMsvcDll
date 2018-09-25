@@ -146,6 +146,8 @@ int64_t GetFrozenTokenBalance(const std::string& address, uint32_t propertyId);
 
 /** Global handler to initialize Omni Core. */
 int mastercore_init();
+int mastercore_init_ex();
+
 
 /** Global handler to shut down Omni Core. */
 int mastercore_shutdown();

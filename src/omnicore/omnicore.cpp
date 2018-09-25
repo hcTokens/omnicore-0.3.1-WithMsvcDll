@@ -1723,6 +1723,145 @@ int mastercore_init()
     return 0;
 }
 
+int mastercore_init_ex()
+{
+    LOCK(cs_tally);
+
+    if (mastercoreInitialized) {
+        // nothing to do
+        return 0;
+    }
+
+    PrintToConsole("Initializing Omni Core v%s [%s]\n", OmniCoreVersion(), Params().NetworkIDString());
+
+    PrintToLog("\nInitializing Omni Core v%s [%s]\n", OmniCoreVersion(), Params().NetworkIDString());
+    PrintToLog("Startup time: %s\n", DateTimeStrFormat("%Y-%m-%d %H:%M:%S", GetTime()));
+
+    InitDebugLogLevels();
+    ShrinkDebugLog();
+
+    if (isNonMainNet()) {
+        exodus_address = exodus_testnet;
+    }
+/*
+    // check for --autocommit option and set transaction commit flag accordingly
+    if (!GetBoolArg("-autocommit", true)) {
+        PrintToLog("Process was started with --autocommit set to false. "
+                "Created Omni transactions will not be committed to wallet or broadcast.\n");
+        autoCommit = false;
+    }
+
+    // check for --startclean option and delete MP_ folders if present
+    bool startClean = false;
+    if (GetBoolArg("-startclean", false)) {
+        PrintToLog("Process was started with --startclean option, attempting to clear persistence files..\n");
+        try {
+            boost::filesystem::path persistPath = GetDataDir() / "MP_persist";
+            boost::filesystem::path txlistPath = GetDataDir() / "MP_txlist";
+            boost::filesystem::path tradePath = GetDataDir() / "MP_tradelist";
+            boost::filesystem::path spPath = GetDataDir() / "MP_spinfo";
+            boost::filesystem::path stoPath = GetDataDir() / "MP_stolist";
+            boost::filesystem::path omniTXDBPath = GetDataDir() / "Omni_TXDB";
+            boost::filesystem::path feesPath = GetDataDir() / "OMNI_feecache";
+            boost::filesystem::path feeHistoryPath = GetDataDir() / "OMNI_feehistory";
+            if (boost::filesystem::exists(persistPath)) boost::filesystem::remove_all(persistPath);
+            if (boost::filesystem::exists(txlistPath)) boost::filesystem::remove_all(txlistPath);
+            if (boost::filesystem::exists(tradePath)) boost::filesystem::remove_all(tradePath);
+            if (boost::filesystem::exists(spPath)) boost::filesystem::remove_all(spPath);
+            if (boost::filesystem::exists(stoPath)) boost::filesystem::remove_all(stoPath);
+            if (boost::filesystem::exists(omniTXDBPath)) boost::filesystem::remove_all(omniTXDBPath);
+            if (boost::filesystem::exists(feesPath)) boost::filesystem::remove_all(feesPath);
+            if (boost::filesystem::exists(feeHistoryPath)) boost::filesystem::remove_all(feeHistoryPath);
+            PrintToLog("Success clearing persistence files in datadir %s\n", GetDataDir().string());
+            startClean = true;
+        } catch (const boost::filesystem::filesystem_error& e) {
+            PrintToLog("Failed to delete persistence folders: %s\n", e.what());
+            PrintToConsole("Failed to delete persistence folders: %s\n", e.what());
+        }
+    }
+*/
+    t_tradelistdb = new CMPTradeList(GetDataDir() / "MP_tradelist", fReindex);
+    s_stolistdb = new CMPSTOList(GetDataDir() / "MP_stolist", fReindex);
+    p_txlistdb = new CMPTxList(GetDataDir() / "MP_txlist", fReindex);
+
+	_my_sps = new CMPSPInfo(GetDataDir() / "MP_spinfo", fReindex);
+    p_OmniTXDB = new COmniTransactionDB(GetDataDir() / "Omni_TXDB", fReindex);
+    p_feecache = new COmniFeeCache(GetDataDir() / "OMNI_feecache", fReindex);
+    p_feehistory = new COmniFeeHistory(GetDataDir() / "OMNI_feehistory", fReindex);
+
+    MPPersistencePath = GetDataDir() / "MP_persist";
+    TryCreateDirectory(MPPersistencePath);
+
+    ++mastercoreInitialized;
+	/*
+    nWaterlineBlock = LoadMostRelevantInMemoryState();
+	
+    if (nWaterlineBlock > 0 && nWaterlineBlock < GetHeight()) {
+        RewindDBsAndState(nWaterlineBlock + 1, 0, true);
+    }
+
+    bool noPreviousState = (nWaterlineBlock <= 0);
+
+    if (nWaterlineBlock > 0) {
+        PrintToConsole("Loading persistent state: OK [block %d]\n", nWaterlineBlock);
+    } else {
+        std::string strReason = "unknown";
+        if (noPreviousState) strReason = "no usable previous state found";
+        PrintToConsole("Loading persistent state: NONE (%s)\n", strReason);
+    }
+
+    if (nWaterlineBlock < 0) {
+        // persistence says we reparse!, nuke some stuff in case the partial loads left stale bits
+        clear_all_state();
+    }
+
+    // legacy code, setting to pre-genesis-block
+    int snapshotHeight = ConsensusParams().GENESIS_BLOCK - 1;
+
+    if (nWaterlineBlock < snapshotHeight) {
+        nWaterlineBlock = snapshotHeight;
+        exodus_prev = 0;
+    }
+
+    // advance the waterline so that we start on the next unaccounted for block
+    nWaterlineBlock += 1;
+
+    // collect the real Exodus balances available at the snapshot time
+    // redundant? do we need to show it both pre-parse and post-parse?  if so let's label the printfs accordingly
+    if (msc_debug_exo) {
+        int64_t exodus_balance = GetTokenBalance(exodus_address, OMNI_PROPERTY_MSC, BALANCE);
+        PrintToLog("Exodus balance at start: %s\n", FormatDivisibleMP(exodus_balance));
+    }
+	*/
+	/*
+    // load feature activation messages from txlistdb and process them accordingly
+    p_txlistdb->LoadActivations(nWaterlineBlock);
+
+    // load all alerts from levelDB (and immediately expire old ones)
+    p_txlistdb->LoadAlerts(nWaterlineBlock);
+
+    // load the state of any freeable properties and frozen addresses from levelDB
+    if (!p_txlistdb->LoadFreezeState(nWaterlineBlock)) {
+        std::string strShutdownReason = "Failed to load freeze state from levelDB.  It is unsafe to continue.\n";
+        PrintToLog(strShutdownReason);
+        if (!GetBoolArg("-overrideforcedshutdown", false)) {
+            AbortNode(strShutdownReason, strShutdownReason);
+        }
+    }
+	
+	
+    // initial scan
+    msc_initial_scan(nWaterlineBlock);
+
+    // display Exodus balance
+    int64_t exodus_balance = GetTokenBalance(exodus_address, OMNI_PROPERTY_MSC, BALANCE);
+    PrintToLog("Exodus balance after initialization: %s\n", FormatDivisibleMP(exodus_balance));
+
+    PrintToConsole("Omni Core initialization completed\n");
+	*/
+    return 0;
+}
+
 /**
  * Global handler to shut down Omni Core.
  *
