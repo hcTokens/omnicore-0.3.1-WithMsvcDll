@@ -1533,7 +1533,7 @@ void clear_all_state()
     exodus_prev = 0;
 }
 
-void RewindDBsAndState(int nHeight, int nBlockPrev = 0, bool fInitialParse = false)
+void RewindDBsAndState(int nHeight, int nBlockPrev , bool fInitialParse)
 {
     // Check if any freeze related transactions would be rolled back - if so wipe the state and startclean
     bool reorgContainsFreeze = p_txlistdb->CheckForFreezeTxs(nHeight);
@@ -1546,30 +1546,30 @@ void RewindDBsAndState(int nHeight, int nBlockPrev = 0, bool fInitialParse = fal
     p_feehistory->RollBackHistory(nHeight);
     reorgRecoveryMaxHeight = 0;
 
-    nWaterlineBlock = ConsensusParams().GENESIS_BLOCK - 1;
+    //nWaterlineBlock = ConsensusParams().GENESIS_BLOCK - 1;
 
-    if (reorgContainsFreeze && !fInitialParse) {
-       PrintToConsole("Reorganization containing freeze related transactions detected, forcing a reparse...\n");
-       clear_all_state(); // unable to reorg freezes safely, clear state and reparse
-    } else {
-        int best_state_block = LoadMostRelevantInMemoryState();
-        if (best_state_block < 0) {
-            // unable to recover easily, remove stale stale state bits and reparse from the beginning.
-            clear_all_state();
-        } else {
-            nWaterlineBlock = best_state_block;
-        }
-    }
+    //if (reorgContainsFreeze && !fInitialParse) {
+    //   PrintToConsole("Reorganization containing freeze related transactions detected, forcing a reparse...\n");
+    //   clear_all_state(); // unable to reorg freezes safely, clear state and reparse
+    //} else {
+    //    int best_state_block = LoadMostRelevantInMemoryState();
+    //    if (best_state_block < 0) {
+    //        // unable to recover easily, remove stale stale state bits and reparse from the beginning.
+    //        clear_all_state();
+    //    } else {
+    //        nWaterlineBlock = best_state_block;
+    //    }
+    //}
 
     // clear the global wallet property list, perform a forced wallet update and tell the UI that state is no longer valid, and UI views need to be reinit
-    global_wallet_property_list.clear();
-    CheckWalletUpdate(true);
-    uiInterface.OmniStateInvalidated();
+    //global_wallet_property_list.clear();
+    //CheckWalletUpdate(true);
+    //uiInterface.OmniStateInvalidated();
 
-    if (nWaterlineBlock < nBlockPrev) {
-        // scan from the block after the best active block to catch up to the active chain
-        msc_initial_scan(nWaterlineBlock + 1);
-    }
+    //if (nWaterlineBlock < nBlockPrev) {
+    //    // scan from the block after the best active block to catch up to the active chain
+    //    msc_initial_scan(nWaterlineBlock + 1);
+    //}
 }
 
 /**
@@ -1982,29 +1982,25 @@ bool mastercore_handler_tx(const CTransaction& tx, int nBlock, unsigned int idx,
     return fFoundTx;
 }
 
-bool mastercore_handler_mptx(UniValue root)
+
+bool mastercore_handler_mptx(const UniValue &root)
 {
     LOCK(cs_tally);
-
-    CMPTransaction mp_obj;
+ 
     std::string Sender = root[0].get_str();
     std::string Reference = root[1].get_str();
-
     std::vector<unsigned char> vecTxHash = ParseHex(root[2].get_str());
     std::vector<unsigned char> vecBlockHash = ParseHex(root[3].get_str());
-
-    INT64 Block = root[4].get_int64();
-    INT64 Idx = root[5].get_int64();
+    int64_t Block = root[4].get_int64();
+    int64_t Idx = root[5].get_int64();
     std::string ScriptEncode = root[6].get_str();
     std::vector<unsigned char> Script = ParseHex(ScriptEncode);
-    INT64 Fee = root[7].get_int64();
-    INT64 Time = root[8].get_int64();
-	PendingDelete(uint256(vecTxHash));
-	if(Script.empty())
-	{
-		return false;
-	}
+    int64_t Fee = root[7].get_int64();
+    int64_t Time = root[8].get_int64();
+   
 
+    CMPTransaction mp_obj;
+   
     mp_obj.unlockLogic();
     mp_obj.Set(uint256(vecTxHash), Block, Idx, Time);
     mp_obj.SetBlockHash(uint256(vecBlockHash));
@@ -2013,8 +2009,6 @@ bool mastercore_handler_mptx(UniValue root)
     if (!mastercoreInitialized) {
         mastercore_init();
     }
-
-    mp_obj.unlockLogic();
 
     bool fFoundTx = false;
 
@@ -2025,12 +2019,14 @@ bool mastercore_handler_mptx(UniValue root)
     // Only structurally valid transactions get recorded in levelDB
     // PKT_ERROR - 2 = interpret_Transaction failed, structurally invalid payload
     if (interp_ret != PKT_ERROR - 2) {
+        PrintToLog("!!! omni insert to db:%s\n", uint256(vecTxHash).ToString());
+        
         bool bValid = (0 <= interp_ret);
         p_txlistdb->recordTX(uint256(vecTxHash), bValid, Block, mp_obj.getType(), mp_obj.getNewAmount());
         p_OmniTXDB->RecordTransaction(uint256(vecTxHash), Idx, interp_ret);
     }
 
-    fFoundTx |= (interp_ret == 0);
+    fFoundTx |= (interp_ret == 0); 
 
     if (fFoundTx && msc_debug_consensus_hash_every_transaction) {
         uint256 consensusHash = GetConsensusHash();
