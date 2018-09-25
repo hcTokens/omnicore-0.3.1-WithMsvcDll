@@ -2044,18 +2044,6 @@ int CMPTransaction::logicMath_RevokeTokens()
 /** Tx 70 */
 int CMPTransaction::logicMath_ChangeIssuer()
 {
-    uint256 blockHash;
-    {
-        LOCK(cs_main);
-
-        CBlockIndex* pindex = chainActive[block];
-        if (pindex == NULL) {
-            PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
-            return (PKT_ERROR_TOKENS -20);
-        }
-        blockHash = pindex->GetBlockHash();
-    }
-
     if (!IsTransactionTypeAllowed(block, property, type, version)) {
         PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
                 __func__,
@@ -2097,7 +2085,7 @@ int CMPTransaction::logicMath_ChangeIssuer()
     // ------------------------------------------
 
     sp.issuer = receiver;
-    sp.update_block = blockHash;
+    sp.update_block = _blockHash;
 
     assert(_my_sps->updateSP(property, sp));
 
