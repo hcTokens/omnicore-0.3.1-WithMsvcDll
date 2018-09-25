@@ -1200,8 +1200,8 @@ UniValue omni_sendchangeissuer(const UniValue& params, bool fHelp)
         );
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
-    std::string toAddress = ParseAddress(params[1]);
+    std::string fromAddress = ParseText(params[0]);
+    std::string toAddress = ParseText(params[1]);
     uint32_t propertyId = ParsePropertyId(params[2]);
 
     // perform checks
@@ -1211,21 +1211,11 @@ UniValue omni_sendchangeissuer(const UniValue& params, bool fHelp)
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_ChangeIssuer(propertyId);
 
-    // request the wallet build the transaction (and if needed commit it)
-    uint256 txid;
-    std::string rawHex;
-    int result = WalletTxBuilder(fromAddress, toAddress, "", 0, payload, txid, rawHex, autoCommit);
-
-    // check error and return the txid (or raw hex depending on autocommit)
-    if (result != 0) {
-        throw JSONRPCError(result, error_str(result));
-    } else {
-        if (!autoCommit) {
-            return rawHex;
-        } else {
-            return txid.GetHex();
-        }
-    }
+    std::vector<unsigned char> vchData;
+    std::vector<unsigned char> vchOmBytes = GetOmMarker();
+    vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+    vchData.insert(vchData.end(), payload.begin(), payload.end());
+    return HexStr(vchData.begin(), vchData.end());
 }
 
 UniValue omni_sendenablefreezing(const UniValue& params, bool fHelp)
@@ -1249,7 +1239,7 @@ UniValue omni_sendenablefreezing(const UniValue& params, bool fHelp)
         );
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
+    std::string fromAddress = ParseText(params[0]);
     uint32_t propertyId = ParsePropertyId(params[1]);
 
     // perform checks
@@ -1260,21 +1250,11 @@ UniValue omni_sendenablefreezing(const UniValue& params, bool fHelp)
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_EnableFreezing(propertyId);
 
-    // request the wallet build the transaction (and if needed commit it)
-    uint256 txid;
-    std::string rawHex;
-    int result = WalletTxBuilder(fromAddress, "", "", 0, payload, txid, rawHex, autoCommit);
-
-    // check error and return the txid (or raw hex depending on autocommit)
-    if (result != 0) {
-        throw JSONRPCError(result, error_str(result));
-    } else {
-        if (!autoCommit) {
-            return rawHex;
-        } else {
-            return txid.GetHex();
-        }
-    }
+    std::vector<unsigned char> vchData;
+    std::vector<unsigned char> vchOmBytes = GetOmMarker();
+    vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+    vchData.insert(vchData.end(), payload.begin(), payload.end());
+    return HexStr(vchData.begin(), vchData.end());
 }
 
 UniValue omni_senddisablefreezing(const UniValue& params, bool fHelp)
@@ -1299,7 +1279,7 @@ UniValue omni_senddisablefreezing(const UniValue& params, bool fHelp)
         );
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
+    std::string fromAddress = ParseText(params[0]);
     uint32_t propertyId = ParsePropertyId(params[1]);
 
     // perform checks
@@ -1310,21 +1290,11 @@ UniValue omni_senddisablefreezing(const UniValue& params, bool fHelp)
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_DisableFreezing(propertyId);
 
-    // request the wallet build the transaction (and if needed commit it)
-    uint256 txid;
-    std::string rawHex;
-    int result = WalletTxBuilder(fromAddress, "", "", 0, payload, txid, rawHex, autoCommit);
-
-    // check error and return the txid (or raw hex depending on autocommit)
-    if (result != 0) {
-        throw JSONRPCError(result, error_str(result));
-    } else {
-        if (!autoCommit) {
-            return rawHex;
-        } else {
-            return txid.GetHex();
-        }
-    }
+    std::vector<unsigned char> vchData;
+    std::vector<unsigned char> vchOmBytes = GetOmMarker();
+    vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+    vchData.insert(vchData.end(), payload.begin(), payload.end());
+    return HexStr(vchData.begin(), vchData.end());
 }
 
 UniValue omni_sendfreeze(const UniValue& params, bool fHelp)
@@ -1347,8 +1317,8 @@ UniValue omni_sendfreeze(const UniValue& params, bool fHelp)
         );
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
-    std::string refAddress = ParseAddress(params[1]);
+    std::string fromAddress = ParseText(params[0]);
+    std::string refAddress = ParseText(params[1]);
     uint32_t propertyId = ParsePropertyId(params[2]);
     int64_t amount = ParseAmount(params[3], isPropertyDivisible(propertyId));
 
@@ -1360,22 +1330,11 @@ UniValue omni_sendfreeze(const UniValue& params, bool fHelp)
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_FreezeTokens(propertyId, amount, refAddress);
 
-    // request the wallet build the transaction (and if needed commit it)
-    // Note: no ref address is sent to WalletTxBuilder as the ref address is contained within the payload
-    uint256 txid;
-    std::string rawHex;
-    int result = WalletTxBuilder(fromAddress, "", "", 0, payload, txid, rawHex, autoCommit);
-
-    // check error and return the txid (or raw hex depending on autocommit)
-    if (result != 0) {
-        throw JSONRPCError(result, error_str(result));
-    } else {
-        if (!autoCommit) {
-            return rawHex;
-        } else {
-            return txid.GetHex();
-        }
-    }
+    std::vector<unsigned char> vchData;
+    std::vector<unsigned char> vchOmBytes = GetOmMarker();
+    vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+    vchData.insert(vchData.end(), payload.begin(), payload.end());
+    return HexStr(vchData.begin(), vchData.end());
 }
 
 UniValue omni_sendunfreeze(const UniValue& params, bool fHelp)
@@ -1398,8 +1357,8 @@ UniValue omni_sendunfreeze(const UniValue& params, bool fHelp)
         );
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
-    std::string refAddress = ParseAddress(params[1]);
+    std::string fromAddress = ParseText(params[0]);
+    std::string refAddress = ParseText(params[1]);
     uint32_t propertyId = ParsePropertyId(params[2]);
     int64_t amount = ParseAmount(params[3], isPropertyDivisible(propertyId));
 
@@ -1411,22 +1370,11 @@ UniValue omni_sendunfreeze(const UniValue& params, bool fHelp)
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_UnfreezeTokens(propertyId, amount, refAddress);
 
-    // request the wallet build the transaction (and if needed commit it)
-    // Note: no ref address is sent to WalletTxBuilder as the ref address is contained within the payload
-    uint256 txid;
-    std::string rawHex;
-    int result = WalletTxBuilder(fromAddress, "", "", 0, payload, txid, rawHex, autoCommit);
-
-    // check error and return the txid (or raw hex depending on autocommit)
-    if (result != 0) {
-        throw JSONRPCError(result, error_str(result));
-    } else {
-        if (!autoCommit) {
-            return rawHex;
-        } else {
-            return txid.GetHex();
-        }
-    }
+    std::vector<unsigned char> vchData;
+    std::vector<unsigned char> vchOmBytes = GetOmMarker();
+    vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+    vchData.insert(vchData.end(), payload.begin(), payload.end());
+    return HexStr(vchData.begin(), vchData.end());
 }
 
 UniValue omni_sendactivation(const UniValue& params, bool fHelp)

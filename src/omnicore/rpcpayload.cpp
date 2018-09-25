@@ -426,7 +426,6 @@ UniValue omni_createpayload_changeissuer(const UniValue& params, bool fHelp)
         );
 
     uint32_t propertyId = ParsePropertyId(params[0]);
-
     std::vector<unsigned char> payload = CreatePayload_ChangeIssuer(propertyId);
 
     return HexStr(payload.begin(), payload.end());
