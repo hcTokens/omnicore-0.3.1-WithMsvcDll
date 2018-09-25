@@ -83,11 +83,12 @@ int parse_cmdline(char* line, char*** argvp)
     return argc;
 }
 
-extern bool AppInit(int argc, char* argv[]);
+extern bool AppInitEx(char* netName);
 
-MYDLLAPI void OmniStart(char* pcArgs)
+MYDLLAPI void OmniStart(char* netName)
 {
-  
+	AppInitEx(netName);
+	/*
     printf(" in OmniStart\n");
 
 	char* argv[] = {"-exe", "-regtest", "-txindex", "-server=1", "-addnode=192.168.1.24", "-reindex-chainstate", "-debug=1"};
@@ -101,5 +102,6 @@ MYDLLAPI void OmniStart(char* pcArgs)
     noui_connect();  // Connect bitcoind signal handlers
     AppInit(7, argv);
     //main(3, argv);
+	*/
 
 }

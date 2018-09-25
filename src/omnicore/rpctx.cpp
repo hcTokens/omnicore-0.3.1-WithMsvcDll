@@ -1563,7 +1563,7 @@ UniValue omni_sendalert(const UniValue& params, bool fHelp)
 
 UniValue omni_readalltxhash(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 0)
+    if (fHelp || params.size() != 0 || !p_txlistdb)
         throw runtime_error(
             "omni_sendalert \"fromaddress\" alerttype expiryvalue typecheck versioncheck \"message\"\n"
             "\nCreates and broadcasts an Omni Core alert.\n"
@@ -1583,7 +1583,7 @@ UniValue omni_readalltxhash(const UniValue& params, bool fHelp)
 
 	std::string retStr;
 
-    for (int i = 0; ; i++) {
+    for (size_t i = 0; i<hashs.size(); i++) {
         retStr += hashs[i].ToString();
         if (i + 1 < hashs.size()) {
             retStr += ":";

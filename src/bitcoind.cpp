@@ -64,19 +64,26 @@ void WaitForShutdown(boost::thread_group* threadGroup)
 //
 // Start
 //
-bool AppInit(int argc, char* argv[])
+bool AppInitEx(char* netName)
 {
-#if 1
 	if (!boost::filesystem::is_directory(GetDataDir(false))) {
 		return false;
     }
-	SelectParams("regtest");
+	if( netName ){
+		SelectParams(netName);
+	}
 
 	RegisterAllCoreRPCCommands(tableRPC);
 	SetRPCWarmupFinished();
 	mastercore_init_ex();
 	return true;
-#endif
+}
+//////////////////////////////////////////////////////////////////////////////
+//
+// Start
+//
+bool AppInit(int argc, char* argv[])
+{
     boost::thread_group threadGroup;
     CScheduler scheduler;
 
