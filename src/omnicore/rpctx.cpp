@@ -130,6 +130,7 @@ UniValue omni_funded_sendall(const UniValue& params, bool fHelp)
 
 UniValue omni_sendrawtx(const UniValue& params, bool fHelp)
 {
+	throw runtime_error("not implement");
     if (fHelp || params.size() < 2 || params.size() > 5)
         throw runtime_error(
             "omni_sendrawtx \"fromaddress\" \"rawtransaction\" ( \"referenceaddress\" \"redeemaddress\" \"referenceamount\" )\n"
@@ -289,10 +290,10 @@ UniValue omni_sendall(const UniValue& params, bool fHelp)
         );
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
-    std::string toAddress = ParseAddress(params[1]);
+    std::string fromAddress = params[0].getValStr();//ParseAddress(params[0]);
+    std::string toAddress = params[1].getValStr();//ParseAddress(params[1]);
     uint8_t ecosystem = ParseEcosystem(params[2]);
-    std::string redeemAddress = (params.size() > 3 && !ParseText(params[3]).empty()) ? ParseAddress(params[3]): "";
+    std::string redeemAddress = (params.size() > 3 && !ParseText(params[3]).empty()) ? params[3].getValStr(): "";
     int64_t referenceAmount = (params.size() > 4) ? ParseAmount(params[4], true): 0;
 
     // perform checks
@@ -301,6 +302,12 @@ UniValue omni_sendall(const UniValue& params, bool fHelp)
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_SendAll(ecosystem);
 
+	std::vector<unsigned char> vchData;
+    std::vector<unsigned char> vchOmBytes = GetOmMarker();
+    vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+    vchData.insert(vchData.end(), payload.begin(), payload.end());
+    return HexStr(vchData.begin(), vchData.end());
+/*
     // request the wallet build the transaction (and if needed commit it)
     uint256 txid;
     std::string rawHex;
@@ -317,6 +324,7 @@ UniValue omni_sendall(const UniValue& params, bool fHelp)
             return txid.GetHex();
         }
     }
+	*/
 }
 
 UniValue omni_senddexsell(const UniValue& params, bool fHelp)
