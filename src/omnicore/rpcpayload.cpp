@@ -41,7 +41,7 @@ UniValue omni_createpayload_simplesend(const UniValue& params, bool fHelp)
     int64_t amount = ParseAmount(params[1], isPropertyDivisible(propertyId));
 
     std::vector<unsigned char> payload = CreatePayload_SimpleSend(propertyId, amount);
-
+	//return PayLoadWrap(payload);
     return HexStr(payload.begin(), payload.end());
 }
 
@@ -67,7 +67,7 @@ UniValue omni_createpayload_sendall(const UniValue& params, bool fHelp)
     uint8_t ecosystem = ParseEcosystem(params[0]);
 
     std::vector<unsigned char> payload = CreatePayload_SendAll(ecosystem);
-
+	//return PayLoadWrap(payload);
     return HexStr(payload.begin(), payload.end());
 }
 
@@ -217,7 +217,7 @@ UniValue omni_createpayload_issuancefixed(const UniValue& params, bool fHelp)
     RequirePropertyName(name);
 
     std::vector<unsigned char> payload = CreatePayload_IssuanceFixed(ecosystem, type, previousId, category, subcategory, name, url, data, amount);
-
+	//return PayLoadWrap(payload);
     return HexStr(payload.begin(), payload.end());
 }
 

@@ -2215,3 +2215,11 @@ const std::vector<unsigned char> GetOmMarker()
 
     return std::vector<unsigned char>(pch, pch + sizeof(pch) / sizeof(pch[0]));
 }
+
+std::string PayLoadWrap(const std::vector<unsigned char>& payload){
+	std::vector<unsigned char> vchData;
+    std::vector<unsigned char> vchOmBytes = GetOmMarker();
+    vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+    vchData.insert(vchData.end(), payload.begin(), payload.end());
+    return HexStr(vchData.begin(), vchData.end());
+}
