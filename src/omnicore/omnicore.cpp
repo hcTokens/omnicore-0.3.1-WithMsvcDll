@@ -2000,6 +2000,10 @@ bool mastercore_handler_mptx(UniValue root)
     INT64 Fee = root[7].get_int64();
     INT64 Time = root[8].get_int64();
 	PendingDelete(uint256(vecTxHash));
+	if(Script.empty())
+	{
+		return false;
+	}
 
     mp_obj.unlockLogic();
     mp_obj.Set(uint256(vecTxHash), Block, Idx, Time);
