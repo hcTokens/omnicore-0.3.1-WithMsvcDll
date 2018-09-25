@@ -541,9 +541,12 @@ void CMPTxList::LoadAlerts(int blockHeight)
     }
 }
 
-void CMPTxList::LoadActivations(int blockHeight)
+std::vector<uint256> CMPTxList::getMPTransactionHash()
 {
-    if (!pdb) return;
+     std::vector<uint256> hashs;
+
+    if (!pdb)
+         return hashs;
 
     leveldb::Slice skey, svalue;
     leveldb::Iterator* it = NewIterator();
@@ -556,8 +559,45 @@ void CMPTxList::LoadActivations(int blockHeight)
         std::string itData = it->value().ToString();
         std::vector<std::string> vstr;
         boost::split(vstr, itData, boost::is_any_of(":"), boost::token_compress_on);
-        if (4 != vstr.size()) continue; // unexpected number of tokens
-        if (atoi(vstr[2]) != OMNICORE_MESSAGE_TYPE_ACTIVATION || atoi(vstr[0]) != 1) continue; // we only care about valid activations
+        if (4 != vstr.size())
+            continue; // unexpected number of tokens
+        //if (atoi(vstr[2]) != OMNICORE_MESSAGE_TYPE_ACTIVATION || atoi(vstr[0]) != 1)
+        //    continue; // we only care about valid activations
+        uint256 txid = uint256S(it->key().ToString());
+        loadOrder.push_back(std::make_pair(atoi(vstr[1]), txid));
+    }
+
+    std::sort(loadOrder.begin(), loadOrder.end());
+
+    for (std::vector<std::pair<int64_t, uint256> >::iterator it = loadOrder.begin(); it != loadOrder.end(); ++it) {
+        uint256 hash = (*it).second;
+        hashs.push_back(hash);
+    }
+
+	return hashs;
+}
+
+
+void CMPTxList::LoadActivations(int blockHeight)
+{
+    if (!pdb)
+        return;
+
+    leveldb::Slice skey, svalue;
+    leveldb::Iterator* it = NewIterator();
+
+    PrintToLog("Loading feature activations from levelDB\n");
+
+    std::vector<std::pair<int64_t, uint256> > loadOrder;
+
+    for (it->SeekToFirst(); it->Valid(); it->Next()) {
+        std::string itData = it->value().ToString();
+        std::vector<std::string> vstr;
+        boost::split(vstr, itData, boost::is_any_of(":"), boost::token_compress_on);
+        if (4 != vstr.size())
+            continue; // unexpected number of tokens
+        if (atoi(vstr[2]) != OMNICORE_MESSAGE_TYPE_ACTIVATION || atoi(vstr[0]) != 1)
+            continue; // we only care about valid activations
         uint256 txid = uint256S(it->key().ToString());
         loadOrder.push_back(std::make_pair(atoi(vstr[1]), txid));
     }

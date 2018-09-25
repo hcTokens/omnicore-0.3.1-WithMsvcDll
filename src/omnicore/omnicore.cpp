@@ -1675,7 +1675,7 @@ int mastercore_init()
 
     if (nWaterlineBlock < 0) {
         // persistence says we reparse!, nuke some stuff in case the partial loads left stale bits
-        clear_all_state();
+        //clear_all_state();
     }
 
     // legacy code, setting to pre-genesis-block
@@ -1982,33 +1982,37 @@ bool mastercore_handler_tx(const CTransaction& tx, int nBlock, unsigned int idx,
     return fFoundTx;
 }
 
-
-bool mastercore_handler_payload(std::string fromAddr, std::string toAddr, uint256 txHash, int nBlock, unsigned int idx, std::string payload)
+bool mastercore_handler_mptx(UniValue root)
 {
     LOCK(cs_tally);
+
+    CMPTransaction mp_obj;
+    std::string Sender = root[0].get_str();
+    std::string Reference = root[1].get_str();
+
+    std::vector<unsigned char> vecTxHash = ParseHex(root[2].get_str());
+    std::vector<unsigned char> vecBlockHash = ParseHex(root[3].get_str());
+
+    INT64 Block = root[4].get_int64();
+    INT64 Idx = root[5].get_int64();
+    std::string ScriptEncode = root[6].get_str();
+    std::vector<unsigned char> Script = ParseHex(ScriptEncode);
+    INT64 Fee = root[7].get_int64();
+    INT64 Time = root[8].get_int64();
+	PendingDelete(uint256(vecTxHash));
+
+    mp_obj.unlockLogic();
+    mp_obj.Set(uint256(vecTxHash), Block, Idx, Time);
+    mp_obj.SetBlockHash(uint256(vecBlockHash));
+    mp_obj.Set(Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee);
 
     if (!mastercoreInitialized) {
         mastercore_init();
     }
 
-    // clear pending, if any
-    // NOTE1: Every incoming TX is checked, not just MP-ones because:
-    // if for some reason the incoming TX doesn't pass our parser validation steps successfuly, I'd still want to clear pending amounts for that TX.
-    // NOTE2: Plus I wanna clear the amount before that TX is parsed by our protocol, in case we ever consider pending amounts in internal calculations.
-    PendingDelete(txHash);
-
-    // we do not care about parsing blocks prior to our waterline (empty blockchain defense)
-    if (nBlock < nWaterlineBlock)
-        return false;
-
-    CMPTransaction mp_obj;
     mp_obj.unlockLogic();
-		
-   std::vector<unsigned char> vecPayload = ParseHex(payload);
-    mp_obj.Set(fromAddr, toAddr, (unsigned char*)&vecPayload[0], vecPayload.size(), 3);
-    mp_obj.interpret_Transaction();
 
-	bool fFoundTx = false;
+    bool fFoundTx = false;
 
     int interp_ret = mp_obj.interpretPacket();
     if (interp_ret)
@@ -2018,14 +2022,15 @@ bool mastercore_handler_payload(std::string fromAddr, std::string toAddr, uint25
     // PKT_ERROR - 2 = interpret_Transaction failed, structurally invalid payload
     if (interp_ret != PKT_ERROR - 2) {
         bool bValid = (0 <= interp_ret);
-        p_txlistdb->recordTX(txHash, bValid, nBlock, mp_obj.getType(), mp_obj.getNewAmount());
-        p_OmniTXDB->RecordTransaction(txHash, idx, interp_ret);
+        p_txlistdb->recordTX(uint256(vecTxHash), bValid, Block, mp_obj.getType(), mp_obj.getNewAmount());
+        p_OmniTXDB->RecordTransaction(uint256(vecTxHash), Idx, interp_ret);
     }
+
     fFoundTx |= (interp_ret == 0);
-    
+
     if (fFoundTx && msc_debug_consensus_hash_every_transaction) {
         uint256 consensusHash = GetConsensusHash();
-        PrintToLog("Consensus hash for transaction %s: %s\n", txHash.GetHex(), consensusHash.GetHex());
+        PrintToLog("Consensus hash for transaction %s: %s\n", uint256(vecTxHash).GetHex(), consensusHash.GetHex());
     }
 
     return fFoundTx;
