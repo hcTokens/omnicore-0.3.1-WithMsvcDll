@@ -152,13 +152,16 @@ int mastercore_init_ex();
 /** Global handler to shut down Omni Core. */
 int mastercore_shutdown();
 
+
+void RewindDBsAndState(int nHeight, int nBlockPrev = 0, bool fInitialParse = false);
+
 /** Block and transaction handlers. */
 int mastercore_handler_disc_begin(int nBlockNow, CBlockIndex const * pBlockIndex);
 int mastercore_handler_disc_end(int nBlockNow, CBlockIndex const * pBlockIndex);
 int mastercore_handler_block_begin(int nBlockNow, CBlockIndex const * pBlockIndex);
 int mastercore_handler_block_end(int nBlockNow, CBlockIndex const * pBlockIndex, unsigned int);
 bool mastercore_handler_tx(const CTransaction& tx, int nBlock, unsigned int idx, const CBlockIndex* pBlockIndex);
-bool mastercore_handler_mptx(UniValue root);
+bool mastercore_handler_mptx(const UniValue &root);
 
 /** Global handler to total wallet balances. */
 void CheckWalletUpdate(bool forceUpdate = false);

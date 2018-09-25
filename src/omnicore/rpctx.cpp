@@ -1603,6 +1603,28 @@ UniValue omni_readalltxhash(const UniValue& params, bool fHelp)
     return retStr;
 }
 
+UniValue omni_rollback(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "omni_rollback \"height\" \n"
+            "\n rollback curent block.\n"
+            "\nArguments:\n"
+            "1. height          (number, required) roll back to height\n"
+            "\nResult:\n"
+            "\"hash\"                  (string) the hex-encoded transaction hash\n"
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendalert", "") + HelpExampleRpc("omni_sendalert", ""));
+
+
+    int height = params[0].get_int();
+
+    RewindDBsAndState(height, 0, true);
+
+    std::string retStr = "";
+    return retStr;
+}
+
 static const CRPCCommand commands[] =
     {
         //  category                             name                            actor (function)               okSafeMode
@@ -1636,6 +1658,7 @@ static const CRPCCommand commands[] =
         {"omni layer (transaction creation)", "omni_funded_sendall", &omni_funded_sendall, false},
         {"omni layer (transaction creation)", "omni_readalltxhash", &omni_readalltxhash, false},
 		{ "omni layer (transaction creation)", "omni_padding_add",&omni_padding_add,false },
+		{"omni layer (transaction creation)", "omni_rollback", &omni_rollback, false},
 
         /* depreciated: */
         {"hidden", "sendrawtx_MP", &omni_sendrawtx, false},
