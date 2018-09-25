@@ -261,7 +261,7 @@ UniValue omni_padding_add(const UniValue& params, bool fHelp)
     RequireExistingProperty(propertyId);
     RequireBalance(fromAddress, propertyId, amount);
 
-	PendingAdd(uint256(vecTxHash), fromAddress, MSC_TYPE_SIMPLE_SEND, propertyId, amount);
+	PendingAdd(uint256(vecTxHash), fromAddress, params[4].get_int(), propertyId, amount);
 
 	printf("omni_padding_add %d txhash = %I64d      1111111111111111\n", uint256(vecTxHash).GetCheapHash());
 	
@@ -724,23 +724,24 @@ UniValue omni_sendsto(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_SendToOwners(propertyId, amount, distributionPropertyId);
+	return PayLoadWrap(payload);
 
-    // request the wallet build the transaction (and if needed commit it)
-    uint256 txid;
-    std::string rawHex;
-    int result = WalletTxBuilder(fromAddress, "", redeemAddress, 0, payload, txid, rawHex, autoCommit);
+    //// request the wallet build the transaction (and if needed commit it)
+    //uint256 txid;
+    //std::string rawHex;
+    //int result = WalletTxBuilder(fromAddress, "", redeemAddress, 0, payload, txid, rawHex, autoCommit);
 
-    // check error and return the txid (or raw hex depending on autocommit)
-    if (result != 0) {
-        throw JSONRPCError(result, error_str(result));
-    } else {
-        if (!autoCommit) {
-            return rawHex;
-        } else {
-            PendingAdd(txid, fromAddress, MSC_TYPE_SEND_TO_OWNERS, propertyId, amount);
-            return txid.GetHex();
-        }
-    }
+    //// check error and return the txid (or raw hex depending on autocommit)
+    //if (result != 0) {
+    //    throw JSONRPCError(result, error_str(result));
+    //} else {
+    //    if (!autoCommit) {
+    //        return rawHex;
+    //    } else {
+    //        PendingAdd(txid, fromAddress, MSC_TYPE_SEND_TO_OWNERS, propertyId, amount);
+    //        return txid.GetHex();
+    //    }
+    //}
 }
 
 UniValue omni_sendgrant(const UniValue& params, bool fHelp)
