@@ -470,8 +470,8 @@ UniValue omni_senddexaccept(const UniValue& params, bool fHelp)
         );
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
-    std::string toAddress = ParseAddress(params[1]);
+    std::string fromAddress = params[0].getValStr();//ParseAddress(params[0]);
+    std::string toAddress =  params[1].getValStr();//ParseAddress(params[1]);
     uint32_t propertyId = ParsePropertyId(params[2]);
     int64_t amount = ParseAmount(params[3], true); // MSC/TMSC is divisible
     bool override = (params.size() > 4) ? params[4].get_bool(): false;
@@ -505,7 +505,8 @@ UniValue omni_senddexaccept(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_DExAccept(propertyId, amount);
-
+	return PayLoadWrap(payload);
+	/*
     // request the wallet build the transaction (and if needed commit it)
     uint256 txid;
     std::string rawHex;
@@ -526,6 +527,7 @@ UniValue omni_senddexaccept(const UniValue& params, bool fHelp)
             return txid.GetHex();
         }
     }
+	*/
 }
 
 UniValue omni_sendissuancecrowdsale(const UniValue& params, bool fHelp)
