@@ -1640,8 +1640,8 @@ UniValue omni_gettradehistoryforaddress(const UniValue& params, bool fHelp)
             + HelpExampleRpc("omni_gettradehistoryforaddress", "\"1MCHESTptvd2LnNp7wmr2sGTpRomteAkq8\"")
         );
 
-    std::string address = ParseAddress(params[0]);
-    uint64_t count = (params.size() > 1) ? params[1].get_int64() : 10;
+    std::string address = params[0].getValStr();
+	uint64_t count = (params.size() > 1) ? params[1].get_int64() : 10;
     uint32_t propertyId = 0;
 
     if (params.size() > 2) {
