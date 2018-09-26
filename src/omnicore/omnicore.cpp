@@ -1989,8 +1989,8 @@ bool mastercore_handler_mptx(const UniValue &root)
  
     std::string Sender = root[0].get_str();
     std::string Reference = root[1].get_str();
-    std::vector<unsigned char> vecTxHash = ParseHex(root[2].get_str());
-    std::vector<unsigned char> vecBlockHash = ParseHex(root[3].get_str());
+    uint256 vecTxHash = uint256S(root[2].get_str());
+    uint256 vecBlockHash = uint256S(root[3].get_str());
     int64_t Block = root[4].get_int64();
     int64_t Idx = root[5].get_int64();
     std::string ScriptEncode = root[6].get_str();
@@ -1998,13 +1998,13 @@ bool mastercore_handler_mptx(const UniValue &root)
     int64_t Fee = root[7].get_int64();
     int64_t Time = root[8].get_int64();
    
-
+	PendingDelete(vecTxHash);
     CMPTransaction mp_obj;
-   
+
     mp_obj.unlockLogic();
-    mp_obj.Set(uint256(vecTxHash), Block, Idx, Time);
-    mp_obj.SetBlockHash(uint256(vecBlockHash));
-    mp_obj.Set(Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee);
+    mp_obj.Set(vecTxHash, Block, Idx, Time);
+    mp_obj.SetBlockHash(vecBlockHash);
+    mp_obj.Set(Sender, Reference, Block, vecTxHash, Block, Idx, &(Script[0]), Script.size(), 3, Fee);
 
     if (!mastercoreInitialized) {
         mastercore_init();
@@ -2019,14 +2019,15 @@ bool mastercore_handler_mptx(const UniValue &root)
     // Only structurally valid transactions get recorded in levelDB
     // PKT_ERROR - 2 = interpret_Transaction failed, structurally invalid payload
     if (interp_ret != PKT_ERROR - 2) {
-        PrintToLog("!!! omni insert to db:%s\n", uint256(vecTxHash).ToString());
-        
+        PrintToLog("omni insert to db:%s\n", vecTxHash.ToString());
+        printf("omni insert to db:%s\n", vecTxHash.ToString().c_str());
+		
         bool bValid = (0 <= interp_ret);
-        p_txlistdb->recordTX(uint256(vecTxHash), bValid, Block, mp_obj.getType(), mp_obj.getNewAmount());
-        p_OmniTXDB->RecordTransaction(uint256(vecTxHash), Idx, interp_ret);
+        p_txlistdb->recordTX(vecTxHash, bValid, Block, mp_obj.getType(), mp_obj.getNewAmount());
+        p_OmniTXDB->RecordTransaction(vecTxHash, Idx, interp_ret);
     }
 
-    fFoundTx |= (interp_ret == 0); 
+    fFoundTx |= (interp_ret == 0);
 
     if (fFoundTx && msc_debug_consensus_hash_every_transaction) {
         uint256 consensusHash = GetConsensusHash();

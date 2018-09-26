@@ -1974,17 +1974,17 @@ int CMPTransaction::logicMath_GrantTokens()
 /** Tx 56 */
 int CMPTransaction::logicMath_RevokeTokens()
 {
-    uint256 blockHash;
-    {
-        LOCK(cs_main);
+    //uint256 blockHash;
+    //{
+    //    LOCK(cs_main);
 
-        CBlockIndex* pindex = chainActive[block];
-        if (pindex == NULL) {
-            PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
-            return (PKT_ERROR_TOKENS -20);
-        }
-        blockHash = pindex->GetBlockHash();
-    }
+    //    CBlockIndex* pindex = chainActive[block];
+    //    if (pindex == NULL) {
+    //        PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
+    //        return (PKT_ERROR_TOKENS -20);
+    //    }
+    //    blockHash = pindex->GetBlockHash();
+    //}
 
     if (!IsTransactionTypeAllowed(block, property, type, version)) {
         PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
@@ -2031,7 +2031,7 @@ int CMPTransaction::logicMath_RevokeTokens()
     dataPt.push_back(0);
     dataPt.push_back(nValue);
     sp.historicalData.insert(std::make_pair(txid, dataPt));
-    sp.update_block = blockHash;
+    sp.update_block = _blockHash;
 
     assert(update_tally_map(sender, property, 0-nValue, BALANCE)); //by ycj assert(update_tally_map(sender, property, -nValue, BALANCE));
     assert(_my_sps->updateSP(property, sp));
