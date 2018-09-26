@@ -1538,23 +1538,18 @@ UniValue omni_readalltxhash(const UniValue& params, bool fHelp)
 
     std::vector<uint256> hashs = p_txlistdb->getMPTransactionHash();
 
-    std::string retStr;
-
+	UniValue values(UniValue::VARR);
+     
     for (size_t i = 0; i < hashs.size(); i++) {
-        retStr += hashs[i].ToString();
-        if (i + 1 < hashs.size()) {
-            retStr += ":";
-        } else {
-            break;
-        }
+        values.push_back(hashs[i].ToString());
     }
 
-    return retStr;
+    return values.write();
 }
 
 UniValue omni_rollback(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 1)
+    if (fHelp || params.size() != 2)
         throw runtime_error(
             "omni_rollback \"height\" \n"
             "\n rollback curent block.\n"
@@ -1567,9 +1562,16 @@ UniValue omni_rollback(const UniValue& params, bool fHelp)
 
 
     int height = params[0].get_int();
+    UniValue hashArray = params[1].get_array();
 
+	
+    for (int i = 0; i < hashArray.size(); i++) {
+        std::string hash = hashArray[i].get_str();
+        _my_sps->popBlock(uint256S(hash));
+    }
+	
     RewindDBsAndState(height, 0, true);
-
+    
     std::string retStr = "";
     return retStr;
 }
