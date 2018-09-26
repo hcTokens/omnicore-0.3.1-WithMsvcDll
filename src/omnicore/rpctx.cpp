@@ -634,12 +634,21 @@ UniValue omni_sendissuancefixed(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_IssuanceFixed(ecosystem, type, previousId, category, subcategory, name, url, data, amount);
+<<<<<<< HEAD
 
     std::vector<unsigned char> vchData;
     std::vector<unsigned char> vchOmBytes = GetOmMarker();
     vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
     vchData.insert(vchData.end(), payload.begin(), payload.end());
     return HexStr(vchData.begin(), vchData.end());
+=======
+	return PayLoadWrap(payload);
+	//std::vector<unsigned char> vchData;
+ //   std::vector<unsigned char> vchOmBytes = GetOmMarker();
+ //   vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+ //   vchData.insert(vchData.end(), payload.begin(), payload.end());
+ //   return HexStr(vchData.begin(), vchData.end());
+>>>>>>> dc2a069e3691da2131b9e59bcbcb5c56cdcfad6a
 }
 
 UniValue omni_sendissuancemanaged(const UniValue& params, bool fHelp)
@@ -789,22 +798,22 @@ UniValue omni_sendgrant(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_Grant(propertyId, amount, memo);
+	return PayLoadWrap(payload);
+    //// request the wallet build the transaction (and if needed commit it)
+    //uint256 txid;
+    //std::string rawHex;
+    //int result = WalletTxBuilder(fromAddress, toAddress, "", 0, payload, txid, rawHex, autoCommit);
 
-    // request the wallet build the transaction (and if needed commit it)
-    uint256 txid;
-    std::string rawHex;
-    int result = WalletTxBuilder(fromAddress, toAddress, "", 0, payload, txid, rawHex, autoCommit);
-
-    // check error and return the txid (or raw hex depending on autocommit)
-    if (result != 0) {
-        throw JSONRPCError(result, error_str(result));
-    } else {
-        if (!autoCommit) {
-            return rawHex;
-        } else {
-            return txid.GetHex();
-        }
-    }
+    //// check error and return the txid (or raw hex depending on autocommit)
+    //if (result != 0) {
+    //    throw JSONRPCError(result, error_str(result));
+    //} else {
+    //    if (!autoCommit) {
+    //        return rawHex;
+    //    } else {
+    //        return txid.GetHex();
+    //    }
+    //}
 }
 
 UniValue omni_sendrevoke(const UniValue& params, bool fHelp)
