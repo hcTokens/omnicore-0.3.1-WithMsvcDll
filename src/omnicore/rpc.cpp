@@ -2207,7 +2207,9 @@ UniValue omni_getactivations(const UniValue& params, bool fHelp)
 
 UniValue omni_getsto(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() < 1 || params.size() > 2)
+	throw runtime_error("not implement");
+    /*
+	if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
             "omni_getsto \"txid\" \"recipientfilter\"\n"
             "\nGet information and recipients of a send-to-owners transaction.\n"
@@ -2252,6 +2254,7 @@ UniValue omni_getsto(const UniValue& params, bool fHelp)
     if (populateResult != 0) PopulateFailure(populateResult);
 
     return txobj;
+	*/
 }
 
 UniValue omni_gettrade(const UniValue& params, bool fHelp)
