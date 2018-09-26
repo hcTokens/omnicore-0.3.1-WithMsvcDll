@@ -1823,17 +1823,17 @@ int CMPTransaction::logicMath_CloseCrowdsale()
 /** Tx 54 */
 int CMPTransaction::logicMath_CreatePropertyManaged()
 {
-    uint256 blockHash;
-    {
-        LOCK(cs_main);
+    //uint256 blockHash;
+    //{
+    //    LOCK(cs_main);
 
-        CBlockIndex* pindex = chainActive[block];
-        if (pindex == NULL) {
-            PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
-            return (PKT_ERROR_SP -20);
-        }
-        blockHash = pindex->GetBlockHash();
-    }
+    //    CBlockIndex* pindex = chainActive[block];
+    //    if (pindex == NULL) {
+    //        PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
+    //        return (PKT_ERROR_SP -20);
+    //    }
+    //    blockHash = pindex->GetBlockHash();
+    //}
 
     if (OMNI_PROPERTY_MSC != ecosystem && OMNI_PROPERTY_TMSC != ecosystem) {
         PrintToLog("%s(): rejected: invalid ecosystem: %d\n", __func__, (uint32_t) ecosystem);
@@ -1873,7 +1873,7 @@ int CMPTransaction::logicMath_CreatePropertyManaged()
     newSP.data.assign(data);
     newSP.fixed = false;
     newSP.manual = true;
-    newSP.creation_block = blockHash;
+    newSP.creation_block = _blockHash;
     newSP.update_block = newSP.creation_block;
 
     uint32_t propertyId = _my_sps->putSP(ecosystem, newSP);
@@ -1887,17 +1887,17 @@ int CMPTransaction::logicMath_CreatePropertyManaged()
 /** Tx 55 */
 int CMPTransaction::logicMath_GrantTokens()
 {
-    uint256 blockHash;
-    {
-        LOCK(cs_main);
+    //uint256 blockHash;
+    //{
+    //    LOCK(cs_main);
 
-        CBlockIndex* pindex = chainActive[block];
-        if (pindex == NULL) {
-            PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
-            return (PKT_ERROR_SP -20);
-        }
-        blockHash = pindex->GetBlockHash();
-    }
+    //    CBlockIndex* pindex = chainActive[block];
+    //    if (pindex == NULL) {
+    //        PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
+    //        return (PKT_ERROR_SP -20);
+    //    }
+    //    blockHash = pindex->GetBlockHash();
+    //}
 
     if (!IsTransactionTypeAllowed(block, property, type, version)) {
         PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
@@ -1949,7 +1949,7 @@ int CMPTransaction::logicMath_GrantTokens()
     dataPt.push_back(nValue);
     dataPt.push_back(0);
     sp.historicalData.insert(std::make_pair(txid, dataPt));
-    sp.update_block = blockHash;
+    sp.update_block = _blockHash;
 
     // Persist the number of granted tokens
     assert(_my_sps->updateSP(property, sp));
