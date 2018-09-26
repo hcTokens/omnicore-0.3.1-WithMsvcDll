@@ -634,21 +634,7 @@ UniValue omni_sendissuancefixed(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_IssuanceFixed(ecosystem, type, previousId, category, subcategory, name, url, data, amount);
-<<<<<<< HEAD
-
-    std::vector<unsigned char> vchData;
-    std::vector<unsigned char> vchOmBytes = GetOmMarker();
-    vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
-    vchData.insert(vchData.end(), payload.begin(), payload.end());
-    return HexStr(vchData.begin(), vchData.end());
-=======
 	return PayLoadWrap(payload);
-	//std::vector<unsigned char> vchData;
- //   std::vector<unsigned char> vchOmBytes = GetOmMarker();
- //   vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
- //   vchData.insert(vchData.end(), payload.begin(), payload.end());
- //   return HexStr(vchData.begin(), vchData.end());
->>>>>>> dc2a069e3691da2131b9e59bcbcb5c56cdcfad6a
 }
 
 UniValue omni_sendissuancemanaged(const UniValue& params, bool fHelp)
