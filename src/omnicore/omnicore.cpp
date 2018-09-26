@@ -1998,7 +1998,7 @@ bool mastercore_handler_mptx(const UniValue &root)
     int64_t Fee = root[7].get_int64();
     int64_t Time = root[8].get_int64();
    
-
+	PendingDelete(uint256(vecTxHash));
     CMPTransaction mp_obj;
    
     mp_obj.unlockLogic();

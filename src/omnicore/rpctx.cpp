@@ -863,22 +863,22 @@ UniValue omni_sendrevoke(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_Revoke(propertyId, amount, memo);
+	return PayLoadWrap(payload);
+    //// request the wallet build the transaction (and if needed commit it)
+    //uint256 txid;
+    //std::string rawHex;
+    //int result = WalletTxBuilder(fromAddress, "", "", 0, payload, txid, rawHex, autoCommit);
 
-    // request the wallet build the transaction (and if needed commit it)
-    uint256 txid;
-    std::string rawHex;
-    int result = WalletTxBuilder(fromAddress, "", "", 0, payload, txid, rawHex, autoCommit);
-
-    // check error and return the txid (or raw hex depending on autocommit)
-    if (result != 0) {
-        throw JSONRPCError(result, error_str(result));
-    } else {
-        if (!autoCommit) {
-            return rawHex;
-        } else {
-            return txid.GetHex();
-        }
-    }
+    //// check error and return the txid (or raw hex depending on autocommit)
+    //if (result != 0) {
+    //    throw JSONRPCError(result, error_str(result));
+    //} else {
+    //    if (!autoCommit) {
+    //        return rawHex;
+    //    } else {
+    //        return txid.GetHex();
+    //    }
+    //}
 }
 
 UniValue omni_sendclosecrowdsale(const UniValue& params, bool fHelp)
