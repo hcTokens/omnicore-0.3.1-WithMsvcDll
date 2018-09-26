@@ -6,6 +6,7 @@
 
 #include "omnicore/rpctx.h"
 
+#include "dbtxlist.h"
 #include "omnicore/createpayload.h"
 #include "omnicore/dex.h"
 #include "omnicore/errors.h"
@@ -16,7 +17,6 @@
 #include "omnicore/sp.h"
 #include "omnicore/tx.h"
 #include "omnicore/wallettxbuilder.h"
-#include "dbtxlist.h"
 
 #include "init.h"
 #include "main.h"
@@ -28,8 +28,8 @@
 
 #include <univalue.h>
 
-#include <stdint.h>
 #include <stdexcept>
+#include <stdint.h>
 #include <string>
 
 using std::runtime_error;
@@ -56,10 +56,8 @@ UniValue omni_funded_send(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_funded_send", "\"1DFa5bT6KMEr6ta29QJouainsjaNBsJQhH\" \"15cWrfuvMxyxGst2FisrQcvcpF48x6sXoH\" 1 \"100.0\" \"15Jhzz4omEXEyFKbdcccJwuVPea5LqsKM1\"")
-            + HelpExampleRpc("omni_funded_send", "\"1DFa5bT6KMEr6ta29QJouainsjaNBsJQhH\", \"15cWrfuvMxyxGst2FisrQcvcpF48x6sXoH\", 1, \"100.0\", \"15Jhzz4omEXEyFKbdcccJwuVPea5LqsKM1\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_funded_send", "\"1DFa5bT6KMEr6ta29QJouainsjaNBsJQhH\" \"15cWrfuvMxyxGst2FisrQcvcpF48x6sXoH\" 1 \"100.0\" \"15Jhzz4omEXEyFKbdcccJwuVPea5LqsKM1\"") + HelpExampleRpc("omni_funded_send", "\"1DFa5bT6KMEr6ta29QJouainsjaNBsJQhH\", \"15cWrfuvMxyxGst2FisrQcvcpF48x6sXoH\", 1, \"100.0\", \"15Jhzz4omEXEyFKbdcccJwuVPea5LqsKM1\""));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
@@ -104,10 +102,8 @@ UniValue omni_funded_sendall(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_funded_sendall", "\"1DFa5bT6KMEr6ta29QJouainsjaNBsJQhH\" \"15cWrfuvMxyxGst2FisrQcvcpF48x6sXoH\" 1 \"15Jhzz4omEXEyFKbdcccJwuVPea5LqsKM1\"")
-            + HelpExampleRpc("omni_funded_sendall", "\"1DFa5bT6KMEr6ta29QJouainsjaNBsJQhH\", \"15cWrfuvMxyxGst2FisrQcvcpF48x6sXoH\", 1, \"15Jhzz4omEXEyFKbdcccJwuVPea5LqsKM1\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_funded_sendall", "\"1DFa5bT6KMEr6ta29QJouainsjaNBsJQhH\" \"15cWrfuvMxyxGst2FisrQcvcpF48x6sXoH\" 1 \"15Jhzz4omEXEyFKbdcccJwuVPea5LqsKM1\"") + HelpExampleRpc("omni_funded_sendall", "\"1DFa5bT6KMEr6ta29QJouainsjaNBsJQhH\", \"15cWrfuvMxyxGst2FisrQcvcpF48x6sXoH\", 1, \"15Jhzz4omEXEyFKbdcccJwuVPea5LqsKM1\""));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
@@ -130,8 +126,8 @@ UniValue omni_funded_sendall(const UniValue& params, bool fHelp)
 
 UniValue omni_sendrawtx(const UniValue& params, bool fHelp)
 {
-	throw runtime_error("not implement");
-	/*
+    throw runtime_error("not implement");
+    /*
     if (fHelp || params.size() < 2 || params.size() > 5)
         throw runtime_error(
             "omni_sendrawtx \"fromaddress\" \"rawtransaction\" ( \"referenceaddress\" \"redeemaddress\" \"referenceamount\" )\n"
@@ -192,18 +188,16 @@ UniValue omni_send(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_send", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"")
-            + HelpExampleRpc("omni_send", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_send", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"") + HelpExampleRpc("omni_send", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\""));
 
     // obtain parameters & info
     std::string fromAddress = params[0].getValStr(); //ParseAddress(params[0]);
-    std::string toAddress = params[1].getValStr(); //ParseAddress(params[1]);
+    std::string toAddress = params[1].getValStr();   //ParseAddress(params[1]);
     uint32_t propertyId = ParsePropertyId(params[2]);
     int64_t amount = ParseAmount(params[3], isPropertyDivisible(propertyId));
-    std::string redeemAddress = (params.size() > 4 && !ParseText(params[4]).empty()) ? ParseAddress(params[4]): "";
-    int64_t referenceAmount = (params.size() > 5) ? ParseAmount(params[5], true): 0;
+    std::string redeemAddress = (params.size() > 4 && !ParseText(params[4]).empty()) ? ParseAddress(params[4]) : "";
+    int64_t referenceAmount = (params.size() > 5) ? ParseAmount(params[5], true) : 0;
 
     // perform checks
     RequireExistingProperty(propertyId);
@@ -212,13 +206,13 @@ UniValue omni_send(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_SimpleSend(propertyId, amount);
-	return PayLoadWrap(payload);
+    return PayLoadWrap(payload);
 
-	//std::vector<unsigned char> vchData;
- //   std::vector<unsigned char> vchOmBytes = GetOmMarker();
- //   vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
- //   vchData.insert(vchData.end(), payload.begin(), payload.end());
- //   return HexStr(vchData.begin(), vchData.end());
+    //std::vector<unsigned char> vchData;
+    //   std::vector<unsigned char> vchOmBytes = GetOmMarker();
+    //   vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+    //   vchData.insert(vchData.end(), payload.begin(), payload.end());
+    //   return HexStr(vchData.begin(), vchData.end());
     //std::string strReply = JSONRPCReply(HexStr(vchData.begin(), vchData.end()), NullUniValue, root["id"]);
 
     /*
@@ -244,28 +238,25 @@ UniValue omni_send(const UniValue& params, bool fHelp)
 
 UniValue omni_padding_add(const UniValue& params, bool fHelp)
 {
-	if (fHelp || params.size() < 4 || params.size() > 6)
-       throw runtime_error(
-           "\nExamples:\n"
-           + HelpExampleCli("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"")
-           + HelpExampleRpc("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\"")
-    );
+    if (fHelp || params.size() < 4 || params.size() > 6)
+        throw runtime_error(
+            "\nExamples:\n" + HelpExampleCli("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"") + HelpExampleRpc("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\""));
 
     // obtain parameters & info
     std::string fromAddress = params[0].getValStr();
     uint32_t propertyId = ParsePropertyId(params[1]);
     int64_t amount = ParseAmount(params[2], isPropertyDivisible(propertyId));
-	std::vector<unsigned char> vecTxHash = ParseHex(params[3].get_str());
+    std::vector<unsigned char> vecTxHash = ParseHex(params[3].get_str());
 
     // perform checks
     RequireExistingProperty(propertyId);
     RequireBalance(fromAddress, propertyId, amount);
 
-	PendingAdd(uint256(vecTxHash), fromAddress, params[4].get_int(), propertyId, amount);
+    PendingAdd(uint256(vecTxHash), fromAddress, params[4].get_int(), propertyId, amount);
 
-	printf("omni_padding_add %d txhash = %I64d      1111111111111111\n", uint256(vecTxHash).GetCheapHash());
-	
-	return "";
+    printf("omni_padding_add %d txhash = %I64d      1111111111111111\n", uint256(vecTxHash).GetCheapHash());
+
+    return "";
 }
 
 
@@ -287,31 +278,29 @@ UniValue omni_sendall(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendall", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 2")
-            + HelpExampleRpc("omni_sendall", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 2")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendall", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 2") + HelpExampleRpc("omni_sendall", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 2"));
 
     // obtain parameters & info
-    std::string fromAddress = params[0].getValStr();//ParseAddress(params[0]);
-    std::string toAddress = params[1].getValStr();//ParseAddress(params[1]);
+    std::string fromAddress = params[0].getValStr(); //ParseAddress(params[0]);
+    std::string toAddress = params[1].getValStr();   //ParseAddress(params[1]);
     uint8_t ecosystem = ParseEcosystem(params[2]);
-    std::string redeemAddress = (params.size() > 3 && !ParseText(params[3]).empty()) ? params[3].getValStr(): "";
-    int64_t referenceAmount = (params.size() > 4) ? ParseAmount(params[4], true): 0;
+    std::string redeemAddress = (params.size() > 3 && !ParseText(params[3]).empty()) ? params[3].getValStr() : "";
+    int64_t referenceAmount = (params.size() > 4) ? ParseAmount(params[4], true) : 0;
 
     // perform checks
     RequireSaneReferenceAmount(referenceAmount);
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_SendAll(ecosystem);
-	return PayLoadWrap(payload);
+    return PayLoadWrap(payload);
 
-	//std::vector<unsigned char> vchData;
- //   std::vector<unsigned char> vchOmBytes = GetOmMarker();
- //   vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
- //   vchData.insert(vchData.end(), payload.begin(), payload.end());
- //   return HexStr(vchData.begin(), vchData.end());
-/*
+    //std::vector<unsigned char> vchData;
+    //   std::vector<unsigned char> vchOmBytes = GetOmMarker();
+    //   vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
+    //   vchData.insert(vchData.end(), payload.begin(), payload.end());
+    //   return HexStr(vchData.begin(), vchData.end());
+    /*
     // request the wallet build the transaction (and if needed commit it)
     uint256 txid;
     std::string rawHex;
@@ -464,17 +453,15 @@ UniValue omni_senddexaccept(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_senddexaccept", "\"35URq1NN3xL6GeRKUP6vzaQVcxoJiiJKd8\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"15.0\"")
-            + HelpExampleRpc("omni_senddexaccept", "\"35URq1NN3xL6GeRKUP6vzaQVcxoJiiJKd8\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"15.0\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_senddexaccept", "\"35URq1NN3xL6GeRKUP6vzaQVcxoJiiJKd8\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"15.0\"") + HelpExampleRpc("omni_senddexaccept", "\"35URq1NN3xL6GeRKUP6vzaQVcxoJiiJKd8\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"15.0\""));
 
     // obtain parameters & info
-    std::string fromAddress = params[0].getValStr();//ParseAddress(params[0]);
-    std::string toAddress =  params[1].getValStr();//ParseAddress(params[1]);
+    std::string fromAddress = params[0].getValStr(); //ParseAddress(params[0]);
+    std::string toAddress = params[1].getValStr();   //ParseAddress(params[1]);
     uint32_t propertyId = ParsePropertyId(params[2]);
     int64_t amount = ParseAmount(params[3], true); // MSC/TMSC is divisible
-    bool override = (params.size() > 4) ? params[4].get_bool(): false;
+    bool override = (params.size() > 4) ? params[4].get_bool() : false;
 
     // perform checks
     RequirePrimaryToken(propertyId);
@@ -491,7 +478,8 @@ UniValue omni_senddexaccept(const UniValue& params, bool fHelp)
     {
         LOCK(cs_tally);
         const CMPOffer* sellOffer = DEx_getOffer(toAddress, propertyId);
-        if (sellOffer == NULL) throw JSONRPCError(RPC_TYPE_ERROR, "Unable to load sell offer from the distributed exchange");
+        if (sellOffer == NULL)
+            throw JSONRPCError(RPC_TYPE_ERROR, "Unable to load sell offer from the distributed exchange");
         nMinimumAcceptFee = sellOffer->getMinFee();
     }
 
@@ -505,8 +493,8 @@ UniValue omni_senddexaccept(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_DExAccept(propertyId, amount);
-	return PayLoadWrap(payload);
-	/*
+    return PayLoadWrap(payload);
+    /*
     // request the wallet build the transaction (and if needed commit it)
     uint256 txid;
     std::string rawHex;
@@ -557,13 +545,11 @@ UniValue omni_sendissuancecrowdsale(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendissuancecrowdsale", "\"3JYd75REX3HXn1vAU83YuGfmiPXW7BpYXo\" 2 1 0 \"Companies\" \"Bitcoin Mining\" \"Quantum Miner\" \"\" \"\" 2 \"100\" 1483228800 30 2")
-            + HelpExampleRpc("omni_sendissuancecrowdsale", "\"3JYd75REX3HXn1vAU83YuGfmiPXW7BpYXo\", 2, 1, 0, \"Companies\", \"Bitcoin Mining\", \"Quantum Miner\", \"\", \"\", 2, \"100\", 1483228800, 30, 2")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendissuancecrowdsale", "\"3JYd75REX3HXn1vAU83YuGfmiPXW7BpYXo\" 2 1 0 \"Companies\" \"Bitcoin Mining\" \"Quantum Miner\" \"\" \"\" 2 \"100\" 1483228800 30 2") + HelpExampleRpc("omni_sendissuancecrowdsale", "\"3JYd75REX3HXn1vAU83YuGfmiPXW7BpYXo\", 2, 1, 0, \"Companies\", \"Bitcoin Mining\", \"Quantum Miner\", \"\", \"\", 2, \"100\", 1483228800, 30, 2"));
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
+    std::string fromAddress = params[0].getValStr(); // ParseAddress(params[0]);
     uint8_t ecosystem = ParseEcosystem(params[1]);
     uint16_t type = ParsePropertyType(params[2]);
     uint32_t previousId = ParsePreviousPropertyId(params[3]);
@@ -585,7 +571,8 @@ UniValue omni_sendissuancecrowdsale(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_IssuanceVariable(ecosystem, type, previousId, category, subcategory, name, url, data, propertyIdDesired, numTokens, deadline, earlyBonus, issuerPercentage);
-
+    return PayLoadWrap(payload);
+    /*
     // request the wallet build the transaction (and if needed commit it)
     uint256 txid;
     std::string rawHex;
@@ -601,6 +588,7 @@ UniValue omni_sendissuancecrowdsale(const UniValue& params, bool fHelp)
             return txid.GetHex();
         }
     }
+	*/
 }
 
 UniValue omni_sendissuancefixed(const UniValue& params, bool fHelp)
@@ -626,10 +614,8 @@ UniValue omni_sendissuancefixed(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendissuancefixed", "\"3Ck2kEGLJtZw9ENj2tameMCtS3HB7uRar3\" 2 1 0 \"Companies\" \"Bitcoin Mining\" \"Quantum Miner\" \"\" \"\" \"1000000\"")
-            + HelpExampleRpc("omni_sendissuancefixed", "\"3Ck2kEGLJtZw9ENj2tameMCtS3HB7uRar3\", 2, 1, 0, \"Companies\", \"Bitcoin Mining\", \"Quantum Miner\", \"\", \"\", \"1000000\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendissuancefixed", "\"3Ck2kEGLJtZw9ENj2tameMCtS3HB7uRar3\" 2 1 0 \"Companies\" \"Bitcoin Mining\" \"Quantum Miner\" \"\" \"\" \"1000000\"") + HelpExampleRpc("omni_sendissuancefixed", "\"3Ck2kEGLJtZw9ENj2tameMCtS3HB7uRar3\", 2, 1, 0, \"Companies\", \"Bitcoin Mining\", \"Quantum Miner\", \"\", \"\", \"1000000\""));
 
     // obtain parameters & info
     uint8_t ecosystem = ParseEcosystem(params[1]);
@@ -649,7 +635,7 @@ UniValue omni_sendissuancefixed(const UniValue& params, bool fHelp)
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_IssuanceFixed(ecosystem, type, previousId, category, subcategory, name, url, data, amount);
 
-	std::vector<unsigned char> vchData;
+    std::vector<unsigned char> vchData;
     std::vector<unsigned char> vchOmBytes = GetOmMarker();
     vchData.insert(vchData.end(), vchOmBytes.begin(), vchOmBytes.end());
     vchData.insert(vchData.end(), payload.begin(), payload.end());
@@ -678,10 +664,8 @@ UniValue omni_sendissuancemanaged(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendissuancemanaged", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\" 2 1 0 \"Companies\" \"Bitcoin Mining\" \"Quantum Miner\" \"\" \"\"")
-            + HelpExampleRpc("omni_sendissuancemanaged", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\", 2, 1, 0, \"Companies\", \"Bitcoin Mining\", \"Quantum Miner\", \"\", \"\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendissuancemanaged", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\" 2 1 0 \"Companies\" \"Bitcoin Mining\" \"Quantum Miner\" \"\" \"\"") + HelpExampleRpc("omni_sendissuancemanaged", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\", 2, 1, 0, \"Companies\", \"Bitcoin Mining\", \"Quantum Miner\", \"\", \"\""));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
@@ -699,7 +683,7 @@ UniValue omni_sendissuancemanaged(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_IssuanceManaged(ecosystem, type, previousId, category, subcategory, name, url, data);
-	return PayLoadWrap(payload);
+    return PayLoadWrap(payload);
     //// request the wallet build the transaction (and if needed commit it)
     //uint256 txid;
     //std::string rawHex;
@@ -735,16 +719,14 @@ UniValue omni_sendsto(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendsto", "\"32Z3tJccZuqQZ4PhJR2hxHC3tjgjA8cbqz\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 3 \"5000\"")
-            + HelpExampleRpc("omni_sendsto", "\"32Z3tJccZuqQZ4PhJR2hxHC3tjgjA8cbqz\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 3, \"5000\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendsto", "\"32Z3tJccZuqQZ4PhJR2hxHC3tjgjA8cbqz\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 3 \"5000\"") + HelpExampleRpc("omni_sendsto", "\"32Z3tJccZuqQZ4PhJR2hxHC3tjgjA8cbqz\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 3, \"5000\""));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
     uint32_t propertyId = ParsePropertyId(params[1]);
     int64_t amount = ParseAmount(params[2], isPropertyDivisible(propertyId));
-    std::string redeemAddress = (params.size() > 3 && !ParseText(params[3]).empty()) ? ParseAddress(params[3]): "";
+    std::string redeemAddress = (params.size() > 3 && !ParseText(params[3]).empty()) ? ParseAddress(params[3]) : "";
     uint32_t distributionPropertyId = (params.size() > 4) ? ParsePropertyId(params[4]) : propertyId;
 
     // perform checks
@@ -752,7 +734,7 @@ UniValue omni_sendsto(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_SendToOwners(propertyId, amount, distributionPropertyId);
-	return PayLoadWrap(payload);
+    return PayLoadWrap(payload);
 
     //// request the wallet build the transaction (and if needed commit it)
     //uint256 txid;
@@ -790,17 +772,15 @@ UniValue omni_sendgrant(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendgrant", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\" \"\" 51 \"7000\"")
-            + HelpExampleRpc("omni_sendgrant", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\", \"\", 51, \"7000\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendgrant", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\" \"\" 51 \"7000\"") + HelpExampleRpc("omni_sendgrant", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\", \"\", 51, \"7000\""));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
-    std::string toAddress = !ParseText(params[1]).empty() ? ParseAddress(params[1]): "";
+    std::string toAddress = !ParseText(params[1]).empty() ? ParseAddress(params[1]) : "";
     uint32_t propertyId = ParsePropertyId(params[2]);
     int64_t amount = ParseAmount(params[3], isPropertyDivisible(propertyId));
-    std::string memo = (params.size() > 4) ? ParseText(params[4]): "";
+    std::string memo = (params.size() > 4) ? ParseText(params[4]) : "";
 
     // perform checks
     RequireExistingProperty(propertyId);
@@ -844,16 +824,14 @@ UniValue omni_sendrevoke(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendrevoke", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\" \"\" 51 \"100\"")
-            + HelpExampleRpc("omni_sendrevoke", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\", \"\", 51, \"100\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendrevoke", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\" \"\" 51 \"100\"") + HelpExampleRpc("omni_sendrevoke", "\"3HsJvhr9qzgRe3ss97b1QHs38rmaLExLcH\", \"\", 51, \"100\""));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
     uint32_t propertyId = ParsePropertyId(params[1]);
     int64_t amount = ParseAmount(params[2], isPropertyDivisible(propertyId));
-    std::string memo = (params.size() > 3) ? ParseText(params[3]): "";
+    std::string memo = (params.size() > 3) ? ParseText(params[3]) : "";
 
     // perform checks
     RequireExistingProperty(propertyId);
@@ -896,13 +874,11 @@ UniValue omni_sendclosecrowdsale(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendclosecrowdsale", "\"3JYd75REX3HXn1vAU83YuGfmiPXW7BpYXo\" 70")
-            + HelpExampleRpc("omni_sendclosecrowdsale", "\"3JYd75REX3HXn1vAU83YuGfmiPXW7BpYXo\", 70")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendclosecrowdsale", "\"3JYd75REX3HXn1vAU83YuGfmiPXW7BpYXo\" 70") + HelpExampleRpc("omni_sendclosecrowdsale", "\"3JYd75REX3HXn1vAU83YuGfmiPXW7BpYXo\", 70"));
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
+    std::string fromAddress = params[0].getValStr(); // ParseAddress(params[0]);
     uint32_t propertyId = ParsePropertyId(params[1]);
 
     // perform checks
@@ -913,7 +889,8 @@ UniValue omni_sendclosecrowdsale(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_CloseCrowdsale(propertyId);
-
+    return PayLoadWrap(payload);
+    /*
     // request the wallet build the transaction (and if needed commit it)
     uint256 txid;
     std::string rawHex;
@@ -929,6 +906,7 @@ UniValue omni_sendclosecrowdsale(const UniValue& params, bool fHelp)
             return txid.GetHex();
         }
     }
+	*/
 }
 
 UniValue trade_MP(const UniValue& params, bool fHelp)
@@ -940,54 +918,47 @@ UniValue trade_MP(const UniValue& params, bool fHelp)
             " - sendtrade_OMNI\n"
             " - sendcanceltradebyprice_OMNI\n"
             " - sendcanceltradebypair_OMNI\n"
-            " - sendcanceltradebypair_OMNI\n"
-        );
+            " - sendcanceltradebypair_OMNI\n");
 
     UniValue values(UniValue::VARR);
     uint8_t action = ParseMetaDExAction(params[5]);
 
     // Forward to the new commands, based on action value
     switch (action) {
-        case CMPTransaction::ADD:
-        {
-            values.push_back(params[0]); // fromAddress
-            values.push_back(params[1]); // propertyIdForSale
-            values.push_back(params[2]); // amountForSale
-            values.push_back(params[3]); // propertyIdDesired
-            values.push_back(params[4]); // amountDesired
-            return omni_sendtrade(values, fHelp);
+    case CMPTransaction::ADD: {
+        values.push_back(params[0]); // fromAddress
+        values.push_back(params[1]); // propertyIdForSale
+        values.push_back(params[2]); // amountForSale
+        values.push_back(params[3]); // propertyIdDesired
+        values.push_back(params[4]); // amountDesired
+        return omni_sendtrade(values, fHelp);
+    }
+    case CMPTransaction::CANCEL_AT_PRICE: {
+        values.push_back(params[0]); // fromAddress
+        values.push_back(params[1]); // propertyIdForSale
+        values.push_back(params[2]); // amountForSale
+        values.push_back(params[3]); // propertyIdDesired
+        values.push_back(params[4]); // amountDesired
+        return omni_sendcanceltradesbyprice(values, fHelp);
+    }
+    case CMPTransaction::CANCEL_ALL_FOR_PAIR: {
+        values.push_back(params[0]); // fromAddress
+        values.push_back(params[1]); // propertyIdForSale
+        values.push_back(params[3]); // propertyIdDesired
+        return omni_sendcanceltradesbypair(values, fHelp);
+    }
+    case CMPTransaction::CANCEL_EVERYTHING: {
+        uint8_t ecosystem = 0;
+        if (isMainEcosystemProperty(params[1].get_int64()) && isMainEcosystemProperty(params[3].get_int64())) {
+            ecosystem = OMNI_PROPERTY_MSC;
         }
-        case CMPTransaction::CANCEL_AT_PRICE:
-        {
-            values.push_back(params[0]); // fromAddress
-            values.push_back(params[1]); // propertyIdForSale
-            values.push_back(params[2]); // amountForSale
-            values.push_back(params[3]); // propertyIdDesired
-            values.push_back(params[4]); // amountDesired
-            return omni_sendcanceltradesbyprice(values, fHelp);
+        if (isTestEcosystemProperty(params[1].get_int64()) && isTestEcosystemProperty(params[3].get_int64())) {
+            ecosystem = OMNI_PROPERTY_TMSC;
         }
-        case CMPTransaction::CANCEL_ALL_FOR_PAIR:
-        {
-            values.push_back(params[0]); // fromAddress
-            values.push_back(params[1]); // propertyIdForSale
-            values.push_back(params[3]); // propertyIdDesired
-            return omni_sendcanceltradesbypair(values, fHelp);
-        }
-        case CMPTransaction::CANCEL_EVERYTHING:
-        {
-            uint8_t ecosystem = 0;
-            if (isMainEcosystemProperty(params[1].get_int64())
-                    && isMainEcosystemProperty(params[3].get_int64())) {
-                ecosystem = OMNI_PROPERTY_MSC;
-            }
-            if (isTestEcosystemProperty(params[1].get_int64())
-                    && isTestEcosystemProperty(params[3].get_int64())) {
-                ecosystem = OMNI_PROPERTY_TMSC;
-            }
-            values.push_back(params[0]); // fromAddress
-            values.push_back(ecosystem);
-            return omni_sendcancelalltrades(values, fHelp);
-        }
+        values.push_back(params[0]); // fromAddress
+        values.push_back(ecosystem);
+        return omni_sendcancelalltrades(values, fHelp);
+    }
     }
 
     throw JSONRPCError(RPC_TYPE_ERROR, "Invalid action (1,2,3,4 only)");
@@ -1011,10 +982,8 @@ UniValue omni_sendtrade(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendtrade", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\" 31 \"250.0\" 1 \"10.0\"")
-            + HelpExampleRpc("omni_sendtrade", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\", 31, \"250.0\", 1, \"10.0\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendtrade", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\" 31 \"250.0\" 1 \"10.0\"") + HelpExampleRpc("omni_sendtrade", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\", 31, \"250.0\", 1, \"10.0\""));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
@@ -1069,10 +1038,8 @@ UniValue omni_sendcanceltradesbyprice(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendcanceltradesbyprice", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\" 31 \"100.0\" 1 \"5.0\"")
-            + HelpExampleRpc("omni_sendcanceltradesbyprice", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\", 31, \"100.0\", 1, \"5.0\"")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendcanceltradesbyprice", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\" 31 \"100.0\" 1 \"5.0\"") + HelpExampleRpc("omni_sendcanceltradesbyprice", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\", 31, \"100.0\", 1, \"5.0\""));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
@@ -1125,10 +1092,8 @@ UniValue omni_sendcanceltradesbypair(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendcanceltradesbypair", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\" 1 31")
-            + HelpExampleRpc("omni_sendcanceltradesbypair", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\", 1, 31")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendcanceltradesbypair", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\" 1 31") + HelpExampleRpc("omni_sendcanceltradesbypair", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\", 1, 31"));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
@@ -1178,10 +1143,8 @@ UniValue omni_sendcancelalltrades(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendcancelalltrades", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\" 1")
-            + HelpExampleRpc("omni_sendcancelalltrades", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\", 1")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendcancelalltrades", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\" 1") + HelpExampleRpc("omni_sendcancelalltrades", "\"3BydPiSLPP3DR5cf726hDQ89fpqWLxPKLR\", 1"));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
@@ -1227,10 +1190,8 @@ UniValue omni_sendchangeissuer(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendchangeissuer", "\"1ARjWDkZ7kT9fwjPrjcQyvbXDkEySzKHwu\" \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 3")
-            + HelpExampleRpc("omni_sendchangeissuer", "\"1ARjWDkZ7kT9fwjPrjcQyvbXDkEySzKHwu\", \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 3")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendchangeissuer", "\"1ARjWDkZ7kT9fwjPrjcQyvbXDkEySzKHwu\" \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 3") + HelpExampleRpc("omni_sendchangeissuer", "\"1ARjWDkZ7kT9fwjPrjcQyvbXDkEySzKHwu\", \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 3"));
 
     // obtain parameters & info
     std::string fromAddress = ParseText(params[0]);
@@ -1266,10 +1227,8 @@ UniValue omni_sendenablefreezing(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendenablefreezing", "\"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 3")
-            + HelpExampleRpc("omni_sendenablefreezing", "\"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 3")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendenablefreezing", "\"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 3") + HelpExampleRpc("omni_sendenablefreezing", "\"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 3"));
 
     // obtain parameters & info
     std::string fromAddress = ParseText(params[0]);
@@ -1306,10 +1265,8 @@ UniValue omni_senddisablefreezing(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_senddisablefreezing", "\"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 3")
-            + HelpExampleRpc("omni_senddisablefreezing", "\"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 3")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_senddisablefreezing", "\"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 3") + HelpExampleRpc("omni_senddisablefreezing", "\"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 3"));
 
     // obtain parameters & info
     std::string fromAddress = ParseText(params[0]);
@@ -1344,10 +1301,8 @@ UniValue omni_sendfreeze(const UniValue& params, bool fHelp)
             "4. amount               (number, required) the amount of tokens to freeze (note: this is unused - once frozen an address cannot send any transactions for the property)\n"
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendfreeze", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\" \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 1 0")
-            + HelpExampleRpc("omni_sendfreeze", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\", \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 1, 0")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendfreeze", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\" \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 1 0") + HelpExampleRpc("omni_sendfreeze", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\", \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 1, 0"));
 
     // obtain parameters & info
     std::string fromAddress = ParseText(params[0]);
@@ -1384,10 +1339,8 @@ UniValue omni_sendunfreeze(const UniValue& params, bool fHelp)
             "4. amount               (number, required) the amount of tokens to unfreeze (note: this is unused - once frozen an address cannot send any transactions for the property)\n"
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendunfreeze", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\" \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 1 0")
-            + HelpExampleRpc("omni_sendunfreeze", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\", \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 1, 0")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendunfreeze", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\" \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 1 0") + HelpExampleRpc("omni_sendunfreeze", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\", \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 1, 0"));
 
     // obtain parameters & info
     std::string fromAddress = ParseText(params[0]);
@@ -1424,10 +1377,8 @@ UniValue omni_sendactivation(const UniValue& params, bool fHelp)
             "4. minclientversion     (number, required) the minimum supported client version\n"
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendactivation", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\" 1 370000 999")
-            + HelpExampleRpc("omni_sendactivation", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\", 1, 370000, 999")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendactivation", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\" 1 370000 999") + HelpExampleRpc("omni_sendactivation", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\", 1, 370000, 999"));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
@@ -1467,10 +1418,8 @@ UniValue omni_senddeactivation(const UniValue& params, bool fHelp)
             "2. featureid            (number, required) the identifier of the feature to activate\n"
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
-            "\nExamples:\n"
-            + HelpExampleCli("omni_senddeactivation", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\" 1")
-            + HelpExampleRpc("omni_senddeactivation", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\", 1")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_senddeactivation", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\" 1") + HelpExampleRpc("omni_senddeactivation", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\", 1"));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
@@ -1510,10 +1459,8 @@ UniValue omni_sendalert(const UniValue& params, bool fHelp)
             "4. message              (string, required) the user-faced alert message\n"
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
-            "\nExamples:\n"
-            + HelpExampleCli("omni_sendalert", "")
-            + HelpExampleRpc("omni_sendalert", "")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendalert", "") + HelpExampleRpc("omni_sendalert", ""));
 
     // obtain parameters & info
     std::string fromAddress = ParseAddress(params[0]);
@@ -1570,15 +1517,15 @@ UniValue omni_readalltxhash(const UniValue& params, bool fHelp)
 
     std::vector<uint256> hashs = p_txlistdb->getMPTransactionHash();
 
-	std::string retStr;
+    std::string retStr;
 
-    for (size_t i = 0; i<hashs.size(); i++) {
+    for (size_t i = 0; i < hashs.size(); i++) {
         retStr += hashs[i].ToString();
         if (i + 1 < hashs.size()) {
             retStr += ":";
         } else {
             break;
-		}
+        }
     }
 
     return retStr;
@@ -1608,8 +1555,8 @@ UniValue omni_rollback(const UniValue& params, bool fHelp)
 
 static const CRPCCommand commands[] =
     {
-        //  category                             name                            actor (function)               okSafeMode
-        //  ------------------------------------ ------------------------------- ------------------------------ ----------
+//  category                             name                            actor (function)               okSafeMode
+//  ------------------------------------ ------------------------------- ------------------------------ ----------
 #ifdef ENABLE_WALLET
         {"omni layer (transaction creation)", "omni_sendrawtx", &omni_sendrawtx, false},
         {"omni layer (transaction creation)", "omni_send", &omni_send, false},
@@ -1638,8 +1585,8 @@ static const CRPCCommand commands[] =
         {"omni layer (transaction creation)", "omni_funded_send", &omni_funded_send, false},
         {"omni layer (transaction creation)", "omni_funded_sendall", &omni_funded_sendall, false},
         {"omni layer (transaction creation)", "omni_readalltxhash", &omni_readalltxhash, false},
-		{ "omni layer (transaction creation)", "omni_padding_add",&omni_padding_add,false },
-		{"omni layer (transaction creation)", "omni_rollback", &omni_rollback, false},
+        {"omni layer (transaction creation)", "omni_padding_add", &omni_padding_add, false},
+        {"omni layer (transaction creation)", "omni_rollback", &omni_rollback, false},
 
         {"omni layer (transaction creation)", "omni_pending_add", &omni_pending_add, false},
         /* depreciated: */
@@ -1650,7 +1597,7 @@ static const CRPCCommand commands[] =
 #endif
 };
 
-void RegisterOmniTransactionCreationRPCCommands(CRPCTable &tableRPC)
+void RegisterOmniTransactionCreationRPCCommands(CRPCTable& tableRPC)
 {
     for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
         tableRPC.appendCommand(commands[vcidx].name, &commands[vcidx]);
