@@ -858,7 +858,7 @@ UniValue omni_getallbalancesforaddress(const UniValue& params, bool fHelp)
             + HelpExampleRpc("omni_getallbalancesforaddress", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\"")
         );
 
-    std::string address = ParseAddress(params[0]);
+    std::string address = ParseText(params[0]);
 
     UniValue response(UniValue::VARR);
 
@@ -899,7 +899,6 @@ static std::set<std::string> getWalletAddresses(bool fIncludeWatchOnly)
     std::set<std::string> result;
 
 #ifdef ENABLE_WALLET
-    LOCK(pwalletMain->cs_wallet);
 
     BOOST_FOREACH(const PAIRTYPE(CTxDestination, CAddressBookData)& item, pwalletMain->mapAddressBook) {
         const CBitcoinAddress& address = item.first;
@@ -946,9 +945,6 @@ UniValue omni_getwalletbalances(const UniValue& params, bool fHelp)
     UniValue response(UniValue::VARR);
 
 #ifdef ENABLE_WALLET
-    if (!pwalletMain) {
-        return response;
-    }
 
     std::set<std::string> addresses = getWalletAddresses(fIncludeWatchOnly);
     std::map<uint32_t, std::tuple<int64_t, int64_t, int64_t>> balances;
@@ -1060,9 +1056,6 @@ UniValue omni_getwalletaddressbalances(const UniValue& params, bool fHelp)
     UniValue response(UniValue::VARR);
 
 #ifdef ENABLE_WALLET
-    if (!pwalletMain) {
-        return response;
-    }
 
     std::set<std::string> addresses = getWalletAddresses(fIncludeWatchOnly);
 
@@ -1108,7 +1101,7 @@ UniValue omni_getwalletaddressbalances(const UniValue& params, bool fHelp)
 
 UniValue omni_getproperty(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 1)
+    if (fHelp || params.size() > 2 || params.size() == 1)
         throw runtime_error(
             "omni_getproperty propertyid\n"
             "\nReturns details for about the tokens or smart property to lookup.\n"
@@ -1135,7 +1128,7 @@ UniValue omni_getproperty(const UniValue& params, bool fHelp)
         );
 
     uint32_t propertyId = ParsePropertyId(params[0]);
-
+    uint32_t currentHeight = params[1].get_int64();
     RequireExistingProperty(propertyId);
 
     CMPSPInfo::Entry sp;
@@ -1157,9 +1150,8 @@ UniValue omni_getproperty(const UniValue& params, bool fHelp)
     response.push_back(Pair("fixedissuance", sp.fixed));
     response.push_back(Pair("managedissuance", sp.manual));
     if (sp.manual) {
-        int currentBlock = GetHeight();
         LOCK(cs_tally);
-        response.push_back(Pair("freezingenabled", isFreezingEnabled(propertyId, currentBlock)));
+        response.push_back(Pair("freezingenabled", isFreezingEnabled(propertyId, currentHeight)));
     }
     response.push_back(Pair("totaltokens", strTotalTokens));
 
@@ -1898,7 +1890,7 @@ UniValue omni_gettransaction(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "omni_gettransaction \"txid\"\n"
+            "\ \"txid\"\n"
             "\nGet detailed information about an Omni transaction.\n"
             "\nArguments:\n"
             "1. txid                 (string, required) the hash of the transaction to lookup\n"
