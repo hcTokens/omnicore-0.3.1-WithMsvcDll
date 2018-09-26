@@ -331,6 +331,34 @@ UniValue omni_sendall(const UniValue& params, bool fHelp)
 	*/
 }
 
+UniValue omni_pending_add(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 5 || params.size() > 7)
+        throw runtime_error(
+            "\nExamples:\n" + HelpExampleCli("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"") + HelpExampleRpc("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\""));
+
+    // obtain parameters & info
+    std::string fromAddress = params[0].getValStr();
+    uint16_t pendingType = (uint16_t)params[1].get_int();
+    uint32_t propertyId = ParsePropertyId(params[2]);
+    int64_t amount = ParseAmount(params[3], isPropertyDivisible(propertyId));
+    std::vector<unsigned char> vecTxHash = ParseHex(params[4].get_str());
+    bool fSubtract = true;
+    if (params.size() >= 6)
+        fSubtract = params[5].getBool();
+
+    // perform checks
+    RequireExistingProperty(propertyId);
+    RequireBalance(fromAddress, propertyId, amount);
+
+    PendingAdd(uint256(vecTxHash), fromAddress, pendingType, propertyId, amount, fSubtract);
+
+    //printf("omni_padding_add %d txhash = %I64d      1111111111111111\n", uint256(vecTxHash).GetCheapHash());
+
+    return "";
+}
+
+
 UniValue omni_senddexsell(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 7)
@@ -352,13 +380,11 @@ UniValue omni_senddexsell(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"hash\"                  (string) the hex-encoded transaction hash\n"
 
-            "\nExamples:\n"
-            + HelpExampleCli("omni_senddexsell", "\"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"1.5\" \"0.75\" 25 \"0.0005\" 1")
-            + HelpExampleRpc("omni_senddexsell", "\"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"1.5\", \"0.75\", 25, \"0.0005\", 1")
-        );
+            "\nExamples:\n" +
+            HelpExampleCli("omni_senddexsell", "\"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"1.5\" \"0.75\" 25 \"0.0005\" 1") + HelpExampleRpc("omni_senddexsell", "\"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"1.5\", \"0.75\", 25, \"0.0005\", 1"));
 
     // obtain parameters & info
-    std::string fromAddress = ParseAddress(params[0]);
+    std::string fromAddress = params[0].getValStr();
     uint32_t propertyIdForSale = ParsePropertyId(params[1]);
     int64_t amountForSale = 0; // depending on action
     int64_t amountDesired = 0; // depending on action
@@ -367,7 +393,7 @@ UniValue omni_senddexsell(const UniValue& params, bool fHelp)
     uint8_t action = ParseDExAction(params[6]);
 
     // perform conversions
-    if (action <= CMPTransaction::UPDATE) { // actions 3 permit zero values, skip check
+    if (action <= CMPTransaction::UPDATE) {           // actions 3 permit zero values, skip check
         amountForSale = ParseAmount(params[2], true); // TMSC/MSC is divisible
         amountDesired = ParseAmount(params[3], true); // BTC is divisible
         paymentWindow = ParseDExPaymentWindow(params[4]);
@@ -376,31 +402,30 @@ UniValue omni_senddexsell(const UniValue& params, bool fHelp)
 
     // perform checks
     switch (action) {
-        case CMPTransaction::NEW:
-        {
-            RequirePrimaryToken(propertyIdForSale);
-            RequireBalance(fromAddress, propertyIdForSale, amountForSale);
-            RequireNoOtherDExOffer(fromAddress, propertyIdForSale);
-            break;
-        }
-        case CMPTransaction::UPDATE:
-        {
-            RequirePrimaryToken(propertyIdForSale);
-            RequireBalance(fromAddress, propertyIdForSale, amountForSale);
-            RequireMatchingDExOffer(fromAddress, propertyIdForSale);
-            break;
-        }
-        case CMPTransaction::CANCEL:
-        {
-            RequirePrimaryToken(propertyIdForSale);
-            RequireMatchingDExOffer(fromAddress, propertyIdForSale);
-            break;
-        }
+    case CMPTransaction::NEW: {
+        RequirePrimaryToken(propertyIdForSale);
+        RequireBalance(fromAddress, propertyIdForSale, amountForSale);
+        RequireNoOtherDExOffer(fromAddress, propertyIdForSale);
+        break;
+    }
+    case CMPTransaction::UPDATE: {
+        RequirePrimaryToken(propertyIdForSale);
+        RequireBalance(fromAddress, propertyIdForSale, amountForSale);
+        RequireMatchingDExOffer(fromAddress, propertyIdForSale);
+        break;
+    }
+    case CMPTransaction::CANCEL: {
+        RequirePrimaryToken(propertyIdForSale);
+        RequireMatchingDExOffer(fromAddress, propertyIdForSale);
+        break;
+    }
     }
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_DExSell(propertyIdForSale, amountForSale, amountDesired, paymentWindow, minAcceptFee, action);
+    return PayLoadWrap(payload);
 
+    /*
     // request the wallet build the transaction (and if needed commit it)
     uint256 txid;
     std::string rawHex;
@@ -418,6 +443,7 @@ UniValue omni_senddexsell(const UniValue& params, bool fHelp)
             return txid.GetHex();
         }
     }
+	*/
 }
 
 UniValue omni_senddexaccept(const UniValue& params, bool fHelp)
@@ -1613,6 +1639,7 @@ static const CRPCCommand commands[] =
 		{ "omni layer (transaction creation)", "omni_padding_add",&omni_padding_add,false },
 		{"omni layer (transaction creation)", "omni_rollback", &omni_rollback, false},
 
+        {"omni layer (transaction creation)", "omni_pending_add", &omni_pending_add, false},
         /* depreciated: */
         {"hidden", "sendrawtx_MP", &omni_sendrawtx, false},
         {"hidden", "send_MP", &omni_send, false},
