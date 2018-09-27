@@ -60,7 +60,6 @@ int populateRPCTransactionObject(const uint256& txid, UniValue& txobj, std::stri
         return MP_TX_NOT_FOUND;
     }
 	
-    tx.
 
     return populateRPCTransactionObject(tx, blockHash, txobj, filterAddress, extendedDetails, extendedDetailsFilter);
 }
