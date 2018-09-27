@@ -250,31 +250,6 @@ UniValue omni_send(const UniValue& params, bool fHelp)
 	*/
 }
 
-
-UniValue omni_padding_add(const UniValue& params, bool fHelp)
-{
-    if (fHelp || params.size() < 4 || params.size() > 6)
-        throw runtime_error(
-            "\nExamples:\n" + HelpExampleCli("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"") + HelpExampleRpc("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\""));
-
-    // obtain parameters & info
-    std::string fromAddress = params[0].getValStr();
-    uint32_t propertyId = ParsePropertyId(params[1]);
-    int64_t amount = ParseAmount(params[2], isPropertyDivisible(propertyId));
-    std::vector<unsigned char> vecTxHash = ParseHex(params[3].get_str());
-
-    // perform checks
-    RequireExistingProperty(propertyId);
-    RequireBalance(fromAddress, propertyId, amount);
-
-    PendingAdd(uint256(vecTxHash), fromAddress, params[4].get_int(), propertyId, amount);
-
-    printf("omni_padding_add %d txhash = %I64d      1111111111111111\n", uint256(vecTxHash).GetCheapHash());
-
-    return "";
-}
-
-
 UniValue omni_sendall(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 3 || params.size() > 5)
@@ -340,7 +315,7 @@ UniValue omni_pending_add(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 5 || params.size() > 7)
         throw runtime_error(
-            "\nExamples:\n" + HelpExampleCli("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"") + HelpExampleRpc("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\""));
+            "\nExamples:\n" + HelpExampleCli("omni_pending_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"") + HelpExampleRpc("omni_pending_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\""));
 
     // obtain parameters & info
     std::vector<unsigned char> vecTxHash = ParseHex(params[0].get_str());
@@ -360,8 +335,6 @@ UniValue omni_pending_add(const UniValue& params, bool fHelp)
     RequireBalance(fromAddress, propertyId, amount);
 
     PendingAdd(uint256(vecTxHash), fromAddress, pendingType, propertyId, amount, fSubtract);
-
-    //printf("omni_padding_add %d txhash = %I64d      1111111111111111\n", uint256(vecTxHash).GetCheapHash());
 
     return "";
 }
@@ -1614,7 +1587,6 @@ static const CRPCCommand commands[] =
         {"omni layer (transaction creation)", "omni_funded_send", &omni_funded_send, false},
         {"omni layer (transaction creation)", "omni_funded_sendall", &omni_funded_sendall, false},
         {"omni layer (transaction creation)", "omni_readalltxhash", &omni_readalltxhash, false},
-        {"omni layer (transaction creation)", "omni_padding_add", &omni_padding_add, false},
         {"omni layer (transaction creation)", "omni_rollback", &omni_rollback, false},
 
         {"omni layer (transaction creation)", "omni_pending_add", &omni_pending_add, false},
