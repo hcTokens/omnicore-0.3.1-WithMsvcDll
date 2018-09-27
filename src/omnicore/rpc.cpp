@@ -1161,7 +1161,7 @@ UniValue omni_getproperty(const UniValue& params, bool fHelp)
     }
     response.push_back(Pair("totaltokens", strTotalTokens));
 
-    return response;
+    return response; 
 }
 
 UniValue omni_listproperties(const UniValue& params, bool fHelp)
@@ -2495,6 +2495,28 @@ UniValue omni_processtx(const UniValue& params, bool fHelp)
     return "fail";
 }
 
+UniValue omni_processpayment(const UniValue& params, bool fHelp)
+{
+    //Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee
+    int len = params.size();
+
+    if (fHelp || params.size() != 9)
+        throw runtime_error(
+            "omni_processpayment\n"
+            "\nExamples:\n" +
+            HelpExampleCli("omni_processpayment", "000000fff3d3322faddd"));
+
+	std::string Sender = params[0].get_str();
+    std::string Reference = params[1].get_str();
+    uint256 vecTxHash = uint256S(params[2].get_str());
+ 	int64_t Amount = params[3].get_int64();
+    int64_t Block = params[4].get_int64();
+    int64_t Idx = params[5].get_int64();
+
+	return DEx_payment(vecTxHash, Idx, Sender, Reference, Amount, Block)? "fail" :"success";
+}
+
+
 static const CRPCCommand commands[] =
 { //  category                             name                            actor (function)               okSafeMode
   //  ------------------------------------ ------------------------------- ------------------------------ ----------
@@ -2526,8 +2548,9 @@ static const CRPCCommand commands[] =
     { "omni layer (data retrieval)", "omni_getfeedistribution",        &omni_getfeedistribution,         false },
     { "omni layer (data retrieval)", "omni_getfeedistributions",       &omni_getfeedistributions,        false },
     { "omni layer (data retrieval)", "omni_getbalanceshash",           &omni_getbalanceshash,            false },
-    { "omni layer (data retrieval)", "omni_dealopreturn",              &omni_dealopreturn,               false},
-	{ "omni layer (data retrieval)", "omni_processtx",                 &omni_processtx,               false},
+    { "omni layer (data retrieval)", "omni_dealopreturn",              &omni_dealopreturn,               false },
+	{ "omni layer (data retrieval)", "omni_processtx",                 &omni_processtx,					 false },
+	{ "omni layer (data retrieval)", "omni_processpayment",            &omni_processpayment,			 false },
 #ifdef ENABLE_WALLET
     { "omni layer (data retrieval)", "omni_listtransactions",          &omni_listtransactions,           false },
     { "omni layer (data retrieval)", "omni_getfeeshare",               &omni_getfeeshare,                false },
