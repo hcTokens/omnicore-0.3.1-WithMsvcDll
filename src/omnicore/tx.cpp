@@ -718,16 +718,11 @@ bool CMPTransaction::interpret_FreezeTokens()
               With virtual reference transactions a hash160 in the payload sets the receiver.
               Reference outputs are ignored.
     **/
-    unsigned char address_version;
-    uint160 address_hash160;
-    memcpy(&address_version, &pkt[16], 1);
-    memcpy(&address_hash160, &pkt[17], 20);
-    receiver = HashToAddress(address_version, address_hash160);
+    unsigned char address[35];
+    memcpy(&address, &pkt[16], 35);
+    std::string Address((char*)address, 35);
+    receiver = Address;
     if (receiver.empty()) {
-        return false;
-    }
-    CBitcoinAddress recAddress(receiver);
-    if (!recAddress.IsValid()) {
         return false;
     }
 
@@ -757,16 +752,11 @@ bool CMPTransaction::interpret_UnfreezeTokens()
               With virtual reference transactions a hash160 in the payload sets the receiver.
               Reference outputs are ignored.
     **/
-    unsigned char address_version;
-    uint160 address_hash160;
-    memcpy(&address_version, &pkt[16], 1);
-    memcpy(&address_hash160, &pkt[17], 20);
-    receiver = HashToAddress(address_version, address_hash160);
+    unsigned char address[35];
+    memcpy(&address, &pkt[16], 35);
+    std::string Address((char*)address, 35);
+    receiver = Address;
     if (receiver.empty()) {
-        return false;
-    }
-    CBitcoinAddress recAddress(receiver);
-    if (!recAddress.IsValid()) {
         return false;
     }
 
@@ -2095,18 +2085,6 @@ int CMPTransaction::logicMath_ChangeIssuer()
 /** Tx 71 */
 int CMPTransaction::logicMath_EnableFreezing()
 {
-    uint256 blockHash;
-    {
-        LOCK(cs_main);
-
-        CBlockIndex* pindex = chainActive[block];
-        if (pindex == NULL) {
-            PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
-            return (PKT_ERROR_TOKENS -20);
-        }
-        blockHash = pindex->GetBlockHash();
-    }
-
     if (!IsTransactionTypeAllowed(block, property, type, version)) {
         PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
                 __func__,
@@ -2156,18 +2134,6 @@ int CMPTransaction::logicMath_EnableFreezing()
 /** Tx 72 */
 int CMPTransaction::logicMath_DisableFreezing()
 {
-    uint256 blockHash;
-    {
-        LOCK(cs_main);
-
-        CBlockIndex* pindex = chainActive[block];
-        if (pindex == NULL) {
-            PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
-            return (PKT_ERROR_TOKENS -20);
-        }
-        blockHash = pindex->GetBlockHash();
-    }
-
     if (!IsTransactionTypeAllowed(block, property, type, version)) {
         PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
                 __func__,
@@ -2209,18 +2175,6 @@ int CMPTransaction::logicMath_DisableFreezing()
 /** Tx 185 */
 int CMPTransaction::logicMath_FreezeTokens()
 {
-    uint256 blockHash;
-    {
-        LOCK(cs_main);
-
-        CBlockIndex* pindex = chainActive[block];
-        if (pindex == NULL) {
-            PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
-            return (PKT_ERROR_TOKENS -20);
-        }
-        blockHash = pindex->GetBlockHash();
-    }
-
     if (!IsTransactionTypeAllowed(block, property, type, version)) {
         PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
                 __func__,
@@ -2267,18 +2221,6 @@ int CMPTransaction::logicMath_FreezeTokens()
 /** Tx 186 */
 int CMPTransaction::logicMath_UnfreezeTokens()
 {
-    uint256 blockHash;
-    {
-        LOCK(cs_main);
-
-        CBlockIndex* pindex = chainActive[block];
-        if (pindex == NULL) {
-            PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
-            return (PKT_ERROR_TOKENS -20);
-        }
-        blockHash = pindex->GetBlockHash();
-    }
-
     if (!IsTransactionTypeAllowed(block, property, type, version)) {
         PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
                 __func__,

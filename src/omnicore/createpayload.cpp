@@ -376,7 +376,10 @@ std::vector<unsigned char> CreatePayload_FreezeTokens(uint32_t propertyId, uint6
     SwapByteOrder16(messageVer);
     SwapByteOrder32(propertyId);
     SwapByteOrder64(amount);
-    std::vector<unsigned char> addressBytes = AddressToBytes(address);
+
+    std::vector<unsigned char> addressBytes; // = address;
+    addressBytes.resize(address.size());
+    memcpy(&addressBytes[0], address.c_str(), address.size());
 
     PUSH_BACK_BYTES(payload, messageVer);
     PUSH_BACK_BYTES(payload, messageType);
@@ -396,7 +399,11 @@ std::vector<unsigned char> CreatePayload_UnfreezeTokens(uint32_t propertyId, uin
     SwapByteOrder16(messageVer);
     SwapByteOrder32(propertyId);
     SwapByteOrder64(amount);
-    std::vector<unsigned char> addressBytes = AddressToBytes(address);
+    
+    std::vector<unsigned char> addressBytes;// = address;
+    addressBytes.resize(address.size());
+    memcpy(&addressBytes[0], address.c_str(), address.size());
+
 
     PUSH_BACK_BYTES(payload, messageVer);
     PUSH_BACK_BYTES(payload, messageType);
