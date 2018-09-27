@@ -2,22 +2,21 @@
 #include <vector>
 
 #ifdef _WIN32
-	#ifdef MYDLL_IMPORTS
-	#define MYDLLAPI extern "C" __declspec(dllimport)
-	#else
-	#define MYDLLAPI extern "C" __declspec(dllexport)
-	#endif
+#ifdef MYDLL_IMPORTS
+#define MYDLLAPI extern "C" __declspec(dllimport)
 #else
-	#define MYDLLAPI extern "C"	
+#define MYDLLAPI extern "C" __declspec(dllexport)
+#endif
+#else
+#define MYDLLAPI extern "C"
 #endif
 
 extern void PropertyToJSON(const CMPSPInfo::Entry& sProperty, UniValue& property_obj);
 
 
-
 MYDLLAPI const char* JsonCmdReq(char* pcReq)
 {
-	std::string strReq = std::string(pcReq);
+    std::string strReq = std::string(pcReq);
     std::string strReply = HTTPReq_JSONRPC_Simple(strReq);
     static char acTemp[512000];
     if (strReply.size() < sizeof(acTemp)) {
@@ -30,23 +29,33 @@ MYDLLAPI const char* JsonCmdReq(char* pcReq)
         std::copy(strReply.begin(), strReply.end(), vReply.begin());
         return (&vReply[0]);
     }
-
 }
 
-MYDLLAPI void SetCallback(unsigned int uiIndx, void* pGoJsonCmdReq)
-{ //	now just set one callback function,other may add later
-  /*
-  gFunGoJsonCmdReq = (FunGoJsonCmdReq)pGoJsonCmdReq;
+typedef char* (*FunJsonCmdReqOmToHc)(char*);
+FunJsonCmdReqOmToHc gFunJsonCmdReqOmToHc;
+char* JsonCmdReqOmToHc(char* pcReq)
+{
+    if (gFunJsonCmdReqOmToHc == NULL)
+        return NULL;
+    char* pcRsp = gFunJsonCmdReqOmToHc(pcReq);
+    return pcRsp;
+}
 
-    if (gFunGoJsonCmdReq == NULL) {
-        printf("in C gFunGoJsonCmdReq==NULL");
+MYDLLAPI void SetCallback(unsigned int uiIndx, void* pJsonCmdReqOmToHc)
+{ //	now just set one callback function,other may add later
+
+    gFunJsonCmdReqOmToHc = (FunJsonCmdReqOmToHc)pJsonCmdReqOmToHc;
+
+    if (gFunJsonCmdReqOmToHc == NULL) {
+        printf("in C gFunJsonCmdReqOmToHc==NULL");
         return;
     }
 
-    char* pcRsp = gFunGoJsonCmdReq("{\"jsonrpc\" : \"1.0\", \"method\" : \"getinfo\", \"params\" : [], \"id\" : 1}");
-    printf("in C gFunGoJsonCmdReq pcRsp=%s", pcRsp);]
-	*/
+	//char* pcRsp = JsonCmdReqOmToHc("{\"jsonrpc\" : \"1.0\", \"method\" : \"getinfo\", \"params\" : [], \"id\" : 1}");
+    //printf("in C JsonCmdReqOmToHc pcRsp=%s", pcRsp);
 }
+
+
 
 int parse_cmdline(char* line, char*** argvp)
 {
@@ -87,8 +96,8 @@ extern bool AppInitEx(char* netName);
 
 MYDLLAPI void OmniStart(char* netName)
 {
-	AppInitEx(netName);
-	/*
+    AppInitEx(netName);
+    /*
     printf(" in OmniStart\n");
 
 	char* argv[] = {"-exe", "-regtest", "-txindex", "-server=1", "-addnode=192.168.1.24", "-reindex-chainstate", "-debug=1"};
@@ -103,5 +112,4 @@ MYDLLAPI void OmniStart(char* netName)
     AppInit(7, argv);
     //main(3, argv);
 	*/
-
 }

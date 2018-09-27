@@ -26,8 +26,7 @@
 
 using namespace std;
 
-typedef char* (*FunGoJsonCmdReq)(char*);
-extern FunGoJsonCmdReq gFunGoJsonCmdReq;
+
 
 /**
  * @note Do not add or change anything in the information returned by this
@@ -79,9 +78,8 @@ UniValue getinfo(const UniValue& params, bool fHelp)
 #endif
 
 	/*
-	if (gFunGoJsonCmdReq != NULL) {
-        char* pcRsp = gFunGoJsonCmdReq("{\"jsonrpc\" : \"1.0\", \"method\" : \"getinfo\", \"params\" : [], \"id\" : 1}");
-        printf("in C gFunGoJsonCmdReq pcRsp=%s", pcRsp);
+        char* pcRsp = JsonCmdReqOmToHc("{\"jsonrpc\" : \"1.0\", \"method\" : \"getinfo\", \"params\" : [], \"id\" : 1}");
+        printf("in C gFunJsonCmdReqOmToHc pcRsp=%s", pcRsp);
 		return pcRsp;
     }
 	*/
