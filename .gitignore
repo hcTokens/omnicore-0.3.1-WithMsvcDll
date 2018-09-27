@@ -130,3 +130,4 @@ share/BitcoindComparisonTool.jar
 
 libbitcoinconsensus.pc
 contrib/devtools/split-debug.sh
+/build_msvc/.vs/omnicore/v15/.suo
