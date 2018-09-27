@@ -5,7 +5,8 @@
 #include "omnicore/rpc.h"
 #include "omnicore/rpctxobject.h"
 #include "omnicore/rpcvalues.h"
-
+#include "omnicore/dbTxHistory.h"
+#include "tx.h"
 #include "coins.h"
 #include "core_io.h"
 #include "primitives/transaction.h"
@@ -72,41 +73,45 @@ UniValue omni_decodetransaction(const UniValue& params, bool fHelp)
             + HelpExampleRpc("omni_decodetransaction", "\"010000000163af14ce6d477e1c793507e32a5b7696288fa89705c0d02a3f66beb3c5b8afee0100000000ffffffff02ac020000000000004751210261ea979f6a06f9dafe00fb1263ea0aca959875a7073556a088cdfadcd494b3752102a3fd0a8a067e06941e066f78d930bfc47746f097fcd3f7ab27db8ddf37168b6b52ae22020000000000001976a914946cb2e08075bcbaf157e47bcb67eb2b2339d24288ac00000000\", [{\"txid\":\"eeafb8c5b3be663f2ad0c00597a88f2896765b2ae30735791c7e476dce14af63\",\"vout\":1,\"scriptPubKey\":\"76a9149084c0bd89289bc025d0264f7f23148fb683d56c88ac\",\"value\":0.0001123}]")
         );
 
-    CTransaction tx = ParseTransaction(params[0]);
+	uint256 txid = ParseHashV(params[0], "txid");
 
-    // use a dummy coins view to store the user provided transaction inputs
-    CCoinsView viewDummyTemp;
-    CCoinsViewCache viewTemp(&viewDummyTemp);
+	std::string history;
+	int i=1;
+	UniValue txobj;
+	do {
+		history = mastercore::p_txhistory->GetHistory(i++);
+		txobj.read(history);
+		if(uint256S(txobj["TxHash"].getValStr()) == txid)
+		{
+			break;
+		}
+	} while (!history.empty());
 
-    if (params.size() > 1) {
-        std::vector<PrevTxsEntry> prevTxsParsed = ParsePrevTxs(params[1]);
-        InputsToView(prevTxsParsed, viewTemp);
-    }
+	return txobj;
+	/*
+	std::string ScriptEncode = txobj["PayLoad"].get_str();
+    std::vector<unsigned char> Script = ParseHex(ScriptEncode);
 
-    int blockHeight = 0;
-    if (params.size() > 2) {
-        blockHeight = params[2].get_int();
-    }
+	CMPTransaction mp_obj;
+	mp_obj.unlockLogic();
+    mp_obj.Set(uint256S(txobj["TxHash"].getValStr()), txobj["Block"].get_int(), txobj["Idx"].get_int(), txobj["Time"].get_int64());
+    mp_obj.SetBlockHash(uint256S(txobj["BlockHash"].getValStr()));
+    mp_obj.Set(txobj["Sender"].getValStr(),	txobj["Reference"].getValStr(),
+		txobj["Block"].get_int(), uint256S(txobj["TxHash"].getValStr()),
+		txobj["Block"].get_int(), txobj["Idx"].get_int(),
+		&(Script[0]), Script.size(), 3, txobj["Fee"].get_int());
 
-    UniValue txObj(UniValue::VOBJ);
-    int populateResult = -3331;
-    {
-        LOCK2(cs_main, cs_tx_cache);
-        // temporarily switch global coins view cache for transaction inputs
-        std::swap(view, viewTemp);
-        // then get the results
-        populateResult = populateRPCTransactionObject(tx, uint256(), txObj, "", false, "", blockHeight);
-        // and restore the original, unpolluted coins view cache
-        std::swap(viewTemp, view);
-    }
-
-    if (populateResult != 0) PopulateFailure(populateResult);
+    UniValue payloadObj(UniValue::VOBJ);
+    payloadObj.push_back(Pair("payload", mp_obj.getPayload()));
+    payloadObj.push_back(Pair("payloadsize", mp_obj.getPayloadSize()));
 
     return txObj;
+	*/
 }
 
 UniValue omni_createrawtx_opreturn(const UniValue& params, bool fHelp)
 {
+	throw std::runtime_error("not implement");
     if (fHelp || params.size() != 2)
         throw std::runtime_error(
             "omni_createrawtx_opreturn \"rawtx\" \"payload\"\n"
@@ -142,6 +147,8 @@ UniValue omni_createrawtx_opreturn(const UniValue& params, bool fHelp)
 
 UniValue omni_createrawtx_multisig(const UniValue& params, bool fHelp)
 {
+	throw std::runtime_error("not implement");
+	/*
     if (fHelp || params.size() != 4)
         throw std::runtime_error(
             "omni_createrawtx_multisig \"rawtx\" \"payload\" \"seed\" \"redeemkey\"\n"
@@ -177,10 +184,13 @@ UniValue omni_createrawtx_multisig(const UniValue& params, bool fHelp)
             .build();
 
     return EncodeHexTx(tx);
+	*/
 }
 
 UniValue omni_createrawtx_input(const UniValue& params, bool fHelp)
 {
+	throw std::runtime_error("not implement");
+	/*
     if (fHelp || params.size() != 3)
         throw std::runtime_error(
             "omni_createrawtx_input \"rawtx\" \"txid\" n\n"
@@ -212,10 +222,12 @@ UniValue omni_createrawtx_input(const UniValue& params, bool fHelp)
             .build();
 
     return EncodeHexTx(tx);
+	*/
 }
 
 UniValue omni_createrawtx_reference(const UniValue& params, bool fHelp)
 {
+	 throw std::runtime_error("not implement");
     if (fHelp || params.size() < 2 || params.size() > 3)
         throw std::runtime_error(
             "omni_createrawtx_reference \"rawtx\" \"destination\" ( amount )\n"
@@ -253,6 +265,8 @@ UniValue omni_createrawtx_reference(const UniValue& params, bool fHelp)
 
 UniValue omni_createrawtx_change(const UniValue& params, bool fHelp)
 {
+	throw std::runtime_error("not implement");
+	/*
     if (fHelp || params.size() < 4 || params.size() > 5)
         throw std::runtime_error(
             "omni_createrawtx_change \"rawtx\" \"prevtxs\" \"destination\" fee ( position )\n"
@@ -312,6 +326,7 @@ UniValue omni_createrawtx_change(const UniValue& params, bool fHelp)
             .build();
 
     return EncodeHexTx(tx);
+	*/
 }
 
 static const CRPCCommand commands[] =

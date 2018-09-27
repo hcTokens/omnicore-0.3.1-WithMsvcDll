@@ -170,6 +170,7 @@
     <ClCompile Include="..\..\src\omnicore\createtx.cpp" />
     <ClCompile Include="..\..\src\omnicore\dbbase.cpp" />
     <ClCompile Include="..\..\src\omnicore\dbfees.cpp" />
+    <ClCompile Include="..\..\src\omnicore\dbTxHistory.cpp" />
     <ClCompile Include="..\..\src\omnicore\dbspinfo.cpp" />
     <ClCompile Include="..\..\src\omnicore\dbstolist.cpp" />
     <ClCompile Include="..\..\src\omnicore\dbtradelist.cpp" />
@@ -236,6 +237,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\omnicoreApi.h" />
+    <ClInclude Include="..\..\src\omnicore\dbTxHistory.h" />
     <ClInclude Include="..\..\src\omnicore\errors.h" />
     <ClInclude Include="..\..\src\omnicore\tx.h" />
   </ItemGroup>
