@@ -1281,11 +1281,13 @@ UniValue omni_getcrowdsale(const UniValue& params, bool fHelp)
 
     const uint256& creationHash = sp.txid;
 
+	/*
     CTransaction tx;
     uint256 hashBlock;
     if (!GetTransaction(creationHash, tx, Params().GetConsensus(), hashBlock, true)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available about transaction");
     }
+	*/
 
     UniValue response(UniValue::VOBJ);
     bool active = isCrowdsaleActive(propertyId);
@@ -1314,9 +1316,11 @@ UniValue omni_getcrowdsale(const UniValue& params, bool fHelp)
     const std::string& txidClosed = sp.txid_close.GetHex();
 
     int64_t startTime = -1;
+    /*
     if (!hashBlock.IsNull() && GetBlockIndex(hashBlock)) {
         startTime = GetBlockIndex(hashBlock)->nTime;
     }
+	*/
 
     // note the database is already deserialized here and there is minimal performance penalty to iterate recipients to calculate amountRaised
     int64_t amountRaised = 0;
@@ -1760,7 +1764,7 @@ UniValue omni_getactivedexsells(const UniValue& params, bool fHelp)
     std::string addressFilter;
 
     if (params.size() > 0) {
-        addressFilter = ParseAddressOrEmpty(params[0]);
+        addressFilter = params[0].isNull() || params[0].get_str().empty() ? "" : params[0].getValStr(); //ParseAddressOrEmpty(params[0]);
     }
 
     UniValue response(UniValue::VARR);
