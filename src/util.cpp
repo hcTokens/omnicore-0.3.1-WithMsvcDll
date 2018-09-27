@@ -464,7 +464,9 @@ boost::filesystem::path GetDefaultDataDir()
     // Unix: ~/.bitcoin
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Bitcoin";
+    //return GetSpecialFolderPath(CSIDL_APPDATA) / "Bitcoin";
+	return GetSpecialFolderPath(CSIDL_LOCAL_APPDATA) / "hcwallet";
+	
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");

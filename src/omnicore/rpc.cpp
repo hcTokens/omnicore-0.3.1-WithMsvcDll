@@ -1974,42 +1974,17 @@ UniValue omni_listtransactions(const UniValue& params, bool fHelp)
             + HelpExampleRpc("omni_listtransactions", "")
         );
 
-    // obtains parameters - default all wallet addresses & last 10 transactions
-    std::string addressParam;
-    if (params.size() > 0) {
-        if (("*" != params[0].get_str()) && ("" != params[0].get_str())) addressParam = params[0].get_str();
-    }
-    int64_t nCount = 10;
-    if (params.size() > 1) nCount = params[1].get_int64();
-    if (nCount < 0) throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative count");
-    int64_t nFrom = 0;
-    if (params.size() > 2) nFrom = params[2].get_int64();
-    if (nFrom < 0) throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative from");
-    int64_t nStartBlock = 0;
-    if (params.size() > 3) nStartBlock = params[3].get_int64();
-    if (nStartBlock < 0) throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative start block");
-    int64_t nEndBlock = 999999999;
-    if (params.size() > 4) nEndBlock = params[4].get_int64();
-    if (nEndBlock < 0) throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative end block");
-
-    // obtain a sorted list of Omni layer wallet transactions (including STO receipts and pending)
-    std::map<std::string,uint256> walletTransactions = FetchWalletOmniTransactions(nFrom+nCount, nStartBlock, nEndBlock);
-
-    // reverse iterate over (now ordered) transactions and populate RPC objects for each one
-    UniValue response(UniValue::VARR);
-    for (std::map<std::string,uint256>::reverse_iterator it = walletTransactions.rbegin(); it != walletTransactions.rend(); it++) {
-        if (nFrom <= 0 && nCount > 0) {
-            uint256 txHash = it->second;
-            UniValue txobj(UniValue::VOBJ);
-            int populateResult = populateRPCTransactionObject(txHash, txobj, addressParam);
-            if (0 == populateResult) {
-                response.push_back(txobj);
-                nCount--;
-            }
-        }
-        nFrom--;
-    }
-
+	UniValue response(UniValue::VARR);
+	std::string history;
+	int i=1;
+	UniValue txobj;
+	do {
+		history = p_txhistory->GetHistory(i++);
+		if(history.empty())
+			break;
+		txobj.read(history);
+		response.push_back(txobj);
+	} while (!history.empty());
     return response;
 }
 
