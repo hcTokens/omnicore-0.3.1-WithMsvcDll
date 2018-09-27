@@ -2026,8 +2026,16 @@ bool mastercore_handler_mptx(const UniValue &root)
 	value.push_back(Pair("PayLoad", ScriptEncode));
 	value.push_back(Pair("Fee", Fee));
 	value.push_back(Pair("Time", Time));
-	value.push_back(Pair("Type", (int)mp_obj.getType()));
-
+	value.push_back(Pair("Version", (uint64_t)mp_obj.getVersion()));
+	value.push_back(Pair("Type_int", (uint64_t)mp_obj.getType()));
+	value.push_back(Pair("Type", mp_obj.getTypeString()));
+/*
+	txobj.push_back(Pair("version", (uint64_t)mp_obj.getVersion()));
+    txobj.push_back(Pair("type_int", (uint64_t)mp_obj.getType()));
+    if (mp_obj.getType() != MSC_TYPE_SIMPLE_SEND) { // Type 0 will add "Type" attribute during populateRPCTypeSimpleSend
+        txobj.push_back(Pair("type", mp_obj.getTypeString()));
+    }
+*/
 	p_txhistory->PutHistory(value.write());
     if (!mastercoreInitialized) {
         mastercore_init();
