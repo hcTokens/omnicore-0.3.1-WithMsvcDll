@@ -18,6 +18,8 @@
 #include "omnicore/tx.h"
 #include "omnicore/wallettxbuilder.h"
 
+#include "omnicore/parse_string.h"
+
 #include "init.h"
 #include "main.h"
 #include "rpc/server.h"
@@ -333,6 +335,7 @@ UniValue omni_sendall(const UniValue& params, bool fHelp)
 	*/
 }
 
+using mastercore::StrToInt64;
 UniValue omni_pending_add(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 5 || params.size() > 7)
@@ -340,11 +343,14 @@ UniValue omni_pending_add(const UniValue& params, bool fHelp)
             "\nExamples:\n" + HelpExampleCli("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"") + HelpExampleRpc("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\""));
 
     // obtain parameters & info
-    std::string fromAddress = params[0].getValStr();
-    uint16_t pendingType = (uint16_t)params[1].get_int();
-    uint32_t propertyId = ParsePropertyId(params[2]);
-    int64_t amount = ParseAmount(params[3], isPropertyDivisible(propertyId));
-    std::vector<unsigned char> vecTxHash = ParseHex(params[4].get_str());
+    std::vector<unsigned char> vecTxHash = ParseHex(params[0].get_str());
+    std::string fromAddress = params[1].getValStr();
+    uint16_t pendingType = (uint16_t)params[2].get_int();
+    uint32_t propertyId = ParsePropertyId(params[3]);
+    //mastercore::StrToInt64(value.get_str(), isDivisible)
+    //int64_t amount = ParseAmount(params[4], isPropertyDivisible(propertyId));
+    int64_t amount = mastercore::StrToInt64(params[4].get_str(), isPropertyDivisible(propertyId));
+
     bool fSubtract = true;
     if (params.size() >= 6)
         fSubtract = params[5].getBool();

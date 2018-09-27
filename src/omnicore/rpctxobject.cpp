@@ -42,6 +42,23 @@
 // Namespaces
 using namespace mastercore;
 
+//add 20180927 not complete
+int populateRPCTransactionObject2(const uint256& txid, UniValue& txobj, std::string filterAddress, bool extendedDetails, std::string extendedDetailsFilter)
+{
+    CTransaction tx;
+    uint256 blockHash;
+    
+	/*
+    if (!GetTransaction(txid, tx, Params().GetConsensus(), blockHash, true)) {
+        return MP_TX_NOT_FOUND;
+    }
+    return populateRPCTransactionObject(tx, blockHash, txobj, filterAddress, extendedDetails, extendedDetailsFilter);
+	*/
+
+    // finished
+    return 0;
+}
+
 /**
  * Function to standardize RPC output for transactions into a JSON object in either basic or extended mode.
  *
@@ -59,7 +76,7 @@ int populateRPCTransactionObject(const uint256& txid, UniValue& txobj, std::stri
     if (!GetTransaction(txid, tx, Params().GetConsensus(), blockHash, true)) {
         return MP_TX_NOT_FOUND;
     }
-	
+
 
     return populateRPCTransactionObject(tx, blockHash, txobj, filterAddress, extendedDetails, extendedDetailsFilter);
 }
@@ -86,7 +103,8 @@ int populateRPCTransactionObject(const CTransaction& tx, const uint256& blockHas
     // attempt to parse the transaction
     CMPTransaction mp_obj;
     int parseRC = ParseTransaction(tx, blockHeight, 0, mp_obj, blockTime);
-    if (parseRC < 0) return MP_TX_IS_NOT_MASTER_PROTOCOL;
+    if (parseRC < 0)
+        return MP_TX_IS_NOT_MASTER_PROTOCOL;
 
     const uint256& txid = tx.GetHash();
 
@@ -103,7 +121,8 @@ int populateRPCTransactionObject(const CTransaction& tx, const uint256& blockHas
             p_txlistdb->getPurchaseDetails(txid, 1, &tmpBuyer, &tmpSeller, &tmpVout, &tmpPropertyId, &tmpNValue);
         }
         UniValue purchases(UniValue::VARR);
-        if (populateRPCDExPurchases(tx, purchases, filterAddress) <= 0) return -1;
+        if (populateRPCDExPurchases(tx, purchases, filterAddress) <= 0)
+            return -1;
         txobj.push_back(Pair("txid", txid.GetHex()));
         txobj.push_back(Pair("type", "DEx Purchase"));
         txobj.push_back(Pair("sendingaddress", tmpBuyer));
@@ -116,10 +135,12 @@ int populateRPCTransactionObject(const CTransaction& tx, const uint256& blockHas
     }
 
     // check if we're filtering from listtransactions_MP, and if so whether we have a non-match we want to skip
-    if (!filterAddress.empty() && mp_obj.getSender() != filterAddress && mp_obj.getReceiver() != filterAddress) return -1;
+    if (!filterAddress.empty() && mp_obj.getSender() != filterAddress && mp_obj.getReceiver() != filterAddress)
+        return -1;
 
     // parse packet and populate mp_obj
-    if (!mp_obj.interpret_Transaction()) return MP_TX_IS_NOT_MASTER_PROTOCOL;
+    if (!mp_obj.interpret_Transaction())
+        return MP_TX_IS_NOT_MASTER_PROTOCOL;
 
     // obtain validity - only confirmed transactions can be valid
     bool valid = false;
@@ -131,11 +152,13 @@ int populateRPCTransactionObject(const CTransaction& tx, const uint256& blockHas
 
     // populate some initial info for the transaction
     bool fMine = false;
-    if (IsMyAddress(mp_obj.getSender()) || IsMyAddress(mp_obj.getReceiver())) fMine = true;
+    if (IsMyAddress(mp_obj.getSender()) || IsMyAddress(mp_obj.getReceiver()))
+        fMine = true;
     txobj.push_back(Pair("txid", txid.GetHex()));
     txobj.push_back(Pair("fee", FormatDivisibleMP(mp_obj.getFeePaid())));
     txobj.push_back(Pair("sendingaddress", mp_obj.getSender()));
-    if (showRefForTx(mp_obj.getType())) txobj.push_back(Pair("referenceaddress", mp_obj.getReceiver()));
+    if (showRefForTx(mp_obj.getType()))
+        txobj.push_back(Pair("referenceaddress", mp_obj.getReceiver()));
     txobj.push_back(Pair("ismine", fMine));
     txobj.push_back(Pair("version", (uint64_t)mp_obj.getVersion()));
     txobj.push_back(Pair("type_int", (uint64_t)mp_obj.getType()));
@@ -145,7 +168,8 @@ int populateRPCTransactionObject(const CTransaction& tx, const uint256& blockHas
 
     // populate type specific info and extended details if requested
     // extended details are not available for unconfirmed transactions
-    if (confirmations <= 0) extendedDetails = false;
+    if (confirmations <= 0)
+        extendedDetails = false;
     populateRPCTypeInfo(mp_obj, txobj, mp_obj.getType(), extendedDetails, extendedDetailsFilter, confirmations);
 
     // state and chain related information
@@ -172,69 +196,69 @@ int populateRPCTransactionObject(const CTransaction& tx, const uint256& blockHas
 void populateRPCTypeInfo(CMPTransaction& mp_obj, UniValue& txobj, uint32_t txType, bool extendedDetails, std::string extendedDetailsFilter, int confirmations)
 {
     switch (txType) {
-        case MSC_TYPE_SIMPLE_SEND:
-            populateRPCTypeSimpleSend(mp_obj, txobj);
-            break;
-        case MSC_TYPE_SEND_TO_OWNERS:
-            populateRPCTypeSendToOwners(mp_obj, txobj, extendedDetails, extendedDetailsFilter);
-            break;
-        case MSC_TYPE_SEND_ALL:
-            populateRPCTypeSendAll(mp_obj, txobj, confirmations);
-            break;
-        case MSC_TYPE_TRADE_OFFER:
-            populateRPCTypeTradeOffer(mp_obj, txobj);
-            break;
-        case MSC_TYPE_METADEX_TRADE:
-            populateRPCTypeMetaDExTrade(mp_obj, txobj, extendedDetails);
-            break;
-        case MSC_TYPE_METADEX_CANCEL_PRICE:
-            populateRPCTypeMetaDExCancelPrice(mp_obj, txobj, extendedDetails);
-            break;
-        case MSC_TYPE_METADEX_CANCEL_PAIR:
-            populateRPCTypeMetaDExCancelPair(mp_obj, txobj, extendedDetails);
-            break;
-        case MSC_TYPE_METADEX_CANCEL_ECOSYSTEM:
-            populateRPCTypeMetaDExCancelEcosystem(mp_obj, txobj, extendedDetails);
-            break;
-        case MSC_TYPE_ACCEPT_OFFER_BTC:
-            populateRPCTypeAcceptOffer(mp_obj, txobj);
-            break;
-        case MSC_TYPE_CREATE_PROPERTY_FIXED:
-            populateRPCTypeCreatePropertyFixed(mp_obj, txobj, confirmations);
-            break;
-        case MSC_TYPE_CREATE_PROPERTY_VARIABLE:
-            populateRPCTypeCreatePropertyVariable(mp_obj, txobj, confirmations);
-            break;
-        case MSC_TYPE_CREATE_PROPERTY_MANUAL:
-            populateRPCTypeCreatePropertyManual(mp_obj, txobj, confirmations);
-            break;
-        case MSC_TYPE_CLOSE_CROWDSALE:
-            populateRPCTypeCloseCrowdsale(mp_obj, txobj);
-            break;
-        case MSC_TYPE_GRANT_PROPERTY_TOKENS:
-            populateRPCTypeGrant(mp_obj, txobj);
-            break;
-        case MSC_TYPE_REVOKE_PROPERTY_TOKENS:
-            populateRPCTypeRevoke(mp_obj, txobj);
-            break;
-        case MSC_TYPE_CHANGE_ISSUER_ADDRESS:
-            populateRPCTypeChangeIssuer(mp_obj, txobj);
-            break;
-        case MSC_TYPE_ENABLE_FREEZING:
-            populateRPCTypeEnableFreezing(mp_obj, txobj);
-            break;
-        case MSC_TYPE_DISABLE_FREEZING:
-            populateRPCTypeDisableFreezing(mp_obj, txobj);
-            break;
-        case MSC_TYPE_FREEZE_PROPERTY_TOKENS:
-            populateRPCTypeFreezeTokens(mp_obj, txobj);
-            break;
-        case MSC_TYPE_UNFREEZE_PROPERTY_TOKENS:
-            populateRPCTypeUnfreezeTokens(mp_obj, txobj);
-            break;
-        case OMNICORE_MESSAGE_TYPE_ACTIVATION:
-            populateRPCTypeActivation(mp_obj, txobj);
-            break;
+    case MSC_TYPE_SIMPLE_SEND:
+        populateRPCTypeSimpleSend(mp_obj, txobj);
+        break;
+    case MSC_TYPE_SEND_TO_OWNERS:
+        populateRPCTypeSendToOwners(mp_obj, txobj, extendedDetails, extendedDetailsFilter);
+        break;
+    case MSC_TYPE_SEND_ALL:
+        populateRPCTypeSendAll(mp_obj, txobj, confirmations);
+        break;
+    case MSC_TYPE_TRADE_OFFER:
+        populateRPCTypeTradeOffer(mp_obj, txobj);
+        break;
+    case MSC_TYPE_METADEX_TRADE:
+        populateRPCTypeMetaDExTrade(mp_obj, txobj, extendedDetails);
+        break;
+    case MSC_TYPE_METADEX_CANCEL_PRICE:
+        populateRPCTypeMetaDExCancelPrice(mp_obj, txobj, extendedDetails);
+        break;
+    case MSC_TYPE_METADEX_CANCEL_PAIR:
+        populateRPCTypeMetaDExCancelPair(mp_obj, txobj, extendedDetails);
+        break;
+    case MSC_TYPE_METADEX_CANCEL_ECOSYSTEM:
+        populateRPCTypeMetaDExCancelEcosystem(mp_obj, txobj, extendedDetails);
+        break;
+    case MSC_TYPE_ACCEPT_OFFER_BTC:
+        populateRPCTypeAcceptOffer(mp_obj, txobj);
+        break;
+    case MSC_TYPE_CREATE_PROPERTY_FIXED:
+        populateRPCTypeCreatePropertyFixed(mp_obj, txobj, confirmations);
+        break;
+    case MSC_TYPE_CREATE_PROPERTY_VARIABLE:
+        populateRPCTypeCreatePropertyVariable(mp_obj, txobj, confirmations);
+        break;
+    case MSC_TYPE_CREATE_PROPERTY_MANUAL:
+        populateRPCTypeCreatePropertyManual(mp_obj, txobj, confirmations);
+        break;
+    case MSC_TYPE_CLOSE_CROWDSALE:
+        populateRPCTypeCloseCrowdsale(mp_obj, txobj);
+        break;
+    case MSC_TYPE_GRANT_PROPERTY_TOKENS:
+        populateRPCTypeGrant(mp_obj, txobj);
+        break;
+    case MSC_TYPE_REVOKE_PROPERTY_TOKENS:
+        populateRPCTypeRevoke(mp_obj, txobj);
+        break;
+    case MSC_TYPE_CHANGE_ISSUER_ADDRESS:
+        populateRPCTypeChangeIssuer(mp_obj, txobj);
+        break;
+    case MSC_TYPE_ENABLE_FREEZING:
+        populateRPCTypeEnableFreezing(mp_obj, txobj);
+        break;
+    case MSC_TYPE_DISABLE_FREEZING:
+        populateRPCTypeDisableFreezing(mp_obj, txobj);
+        break;
+    case MSC_TYPE_FREEZE_PROPERTY_TOKENS:
+        populateRPCTypeFreezeTokens(mp_obj, txobj);
+        break;
+    case MSC_TYPE_UNFREEZE_PROPERTY_TOKENS:
+        populateRPCTypeUnfreezeTokens(mp_obj, txobj);
+        break;
+    case OMNICORE_MESSAGE_TYPE_ACTIVATION:
+        populateRPCTypeActivation(mp_obj, txobj);
+        break;
     }
 }
 
@@ -243,27 +267,48 @@ void populateRPCTypeInfo(CMPTransaction& mp_obj, UniValue& txobj, uint32_t txTyp
 bool showRefForTx(uint32_t txType)
 {
     switch (txType) {
-        case MSC_TYPE_SIMPLE_SEND: return true;
-        case MSC_TYPE_SEND_TO_OWNERS: return false;
-        case MSC_TYPE_TRADE_OFFER: return false;
-        case MSC_TYPE_METADEX_TRADE: return false;
-        case MSC_TYPE_METADEX_CANCEL_PRICE: return false;
-        case MSC_TYPE_METADEX_CANCEL_PAIR: return false;
-        case MSC_TYPE_METADEX_CANCEL_ECOSYSTEM: return false;
-        case MSC_TYPE_ACCEPT_OFFER_BTC: return true;
-        case MSC_TYPE_CREATE_PROPERTY_FIXED: return false;
-        case MSC_TYPE_CREATE_PROPERTY_VARIABLE: return false;
-        case MSC_TYPE_CREATE_PROPERTY_MANUAL: return false;
-        case MSC_TYPE_CLOSE_CROWDSALE: return false;
-        case MSC_TYPE_GRANT_PROPERTY_TOKENS: return true;
-        case MSC_TYPE_REVOKE_PROPERTY_TOKENS: return false;
-        case MSC_TYPE_CHANGE_ISSUER_ADDRESS: return true;
-        case MSC_TYPE_SEND_ALL: return true;
-        case MSC_TYPE_ENABLE_FREEZING: return false;
-        case MSC_TYPE_DISABLE_FREEZING: return false;
-        case MSC_TYPE_FREEZE_PROPERTY_TOKENS: return true;
-        case MSC_TYPE_UNFREEZE_PROPERTY_TOKENS: return true;
-        case OMNICORE_MESSAGE_TYPE_ACTIVATION: return false;
+    case MSC_TYPE_SIMPLE_SEND:
+        return true;
+    case MSC_TYPE_SEND_TO_OWNERS:
+        return false;
+    case MSC_TYPE_TRADE_OFFER:
+        return false;
+    case MSC_TYPE_METADEX_TRADE:
+        return false;
+    case MSC_TYPE_METADEX_CANCEL_PRICE:
+        return false;
+    case MSC_TYPE_METADEX_CANCEL_PAIR:
+        return false;
+    case MSC_TYPE_METADEX_CANCEL_ECOSYSTEM:
+        return false;
+    case MSC_TYPE_ACCEPT_OFFER_BTC:
+        return true;
+    case MSC_TYPE_CREATE_PROPERTY_FIXED:
+        return false;
+    case MSC_TYPE_CREATE_PROPERTY_VARIABLE:
+        return false;
+    case MSC_TYPE_CREATE_PROPERTY_MANUAL:
+        return false;
+    case MSC_TYPE_CLOSE_CROWDSALE:
+        return false;
+    case MSC_TYPE_GRANT_PROPERTY_TOKENS:
+        return true;
+    case MSC_TYPE_REVOKE_PROPERTY_TOKENS:
+        return false;
+    case MSC_TYPE_CHANGE_ISSUER_ADDRESS:
+        return true;
+    case MSC_TYPE_SEND_ALL:
+        return true;
+    case MSC_TYPE_ENABLE_FREEZING:
+        return false;
+    case MSC_TYPE_DISABLE_FREEZING:
+        return false;
+    case MSC_TYPE_FREEZE_PROPERTY_TOKENS:
+        return true;
+    case MSC_TYPE_UNFREEZE_PROPERTY_TOKENS:
+        return true;
+    case OMNICORE_MESSAGE_TYPE_ACTIVATION:
+        return false;
     }
     return true; // default to true, shouldn't be needed but just in case
 }
@@ -303,16 +348,20 @@ void populateRPCTypeSendToOwners(CMPTransaction& omniObj, UniValue& txobj, bool 
     txobj.push_back(Pair("propertyid", (uint64_t)propertyId));
     txobj.push_back(Pair("divisible", isPropertyDivisible(propertyId)));
     txobj.push_back(Pair("amount", FormatMP(propertyId, omniObj.getAmount())));
-    if (extendedDetails) populateRPCExtendedTypeSendToOwners(omniObj.getHash(), extendedDetailsFilter, txobj, omniObj.getVersion());
+    if (extendedDetails)
+        populateRPCExtendedTypeSendToOwners(omniObj.getHash(), extendedDetailsFilter, txobj, omniObj.getVersion());
 }
 
 void populateRPCTypeSendAll(CMPTransaction& omniObj, UniValue& txobj, int confirmations)
 {
     UniValue subSends(UniValue::VARR);
-    if (omniObj.getEcosystem() == 1) txobj.push_back(Pair("ecosystem", "main"));
-    if (omniObj.getEcosystem() == 2) txobj.push_back(Pair("ecosystem", "test"));
+    if (omniObj.getEcosystem() == 1)
+        txobj.push_back(Pair("ecosystem", "main"));
+    if (omniObj.getEcosystem() == 2)
+        txobj.push_back(Pair("ecosystem", "test"));
     if (confirmations > 0) {
-        if (populateRPCSendAllSubSends(omniObj.getHash(), subSends) > 0) txobj.push_back(Pair("subsends", subSends));
+        if (populateRPCSendAllSubSends(omniObj.getHash(), subSends) > 0)
+            txobj.push_back(Pair("subsends", subSends));
     }
 }
 
@@ -327,9 +376,12 @@ void populateRPCTypeTradeOffer(CMPTransaction& omniObj, UniValue& txobj)
     {
         // NOTE: some manipulation of sell_subaction is needed here
         // TODO: interpretPacket should provide reliable data, cleanup at RPC layer is not cool
-        if (sellSubAction > 3) sellSubAction = 0; // case where subaction byte >3, to have been allowed must be a v0 sell, flip byte to 0
-        if (sellSubAction == 0 && amountOffered > 0) sellSubAction = 1; // case where subaction byte=0, must be a v0 sell, amount > 0 means a new sell
-        if (sellSubAction == 0 && amountOffered == 0) sellSubAction = 3; // case where subaction byte=0. must be a v0 sell, amount of 0 means a cancel
+        if (sellSubAction > 3)
+            sellSubAction = 0; // case where subaction byte >3, to have been allowed must be a v0 sell, flip byte to 0
+        if (sellSubAction == 0 && amountOffered > 0)
+            sellSubAction = 1; // case where subaction byte=0, must be a v0 sell, amount > 0 means a new sell
+        if (sellSubAction == 0 && amountOffered == 0)
+            sellSubAction = 3; // case where subaction byte=0. must be a v0 sell, amount of 0 means a cancel
     }
     {
         // Check levelDB to see if the amount for sale has been amended due to a partial purchase
@@ -350,11 +402,14 @@ void populateRPCTypeTradeOffer(CMPTransaction& omniObj, UniValue& txobj)
     txobj.push_back(Pair("divisible", isPropertyDivisible(propertyId)));
     txobj.push_back(Pair("amount", FormatMP(propertyId, amountOffered)));
     txobj.push_back(Pair("bitcoindesired", FormatDivisibleMP(amountDesired)));
-    txobj.push_back(Pair("timelimit",  temp_offer.getBlockTimeLimit()));
+    txobj.push_back(Pair("timelimit", temp_offer.getBlockTimeLimit()));
     txobj.push_back(Pair("feerequired", FormatDivisibleMP(temp_offer.getMinFee())));
-    if (sellSubAction == 1) txobj.push_back(Pair("action", "new"));
-    if (sellSubAction == 2) txobj.push_back(Pair("action", "update"));
-    if (sellSubAction == 3) txobj.push_back(Pair("action", "cancel"));
+    if (sellSubAction == 1)
+        txobj.push_back(Pair("action", "new"));
+    if (sellSubAction == 2)
+        txobj.push_back(Pair("action", "update"));
+    if (sellSubAction == 3)
+        txobj.push_back(Pair("action", "cancel"));
 }
 
 void populateRPCTypeMetaDExTrade(CMPTransaction& omniObj, UniValue& txobj, bool extendedDetails)
@@ -373,7 +428,8 @@ void populateRPCTypeMetaDExTrade(CMPTransaction& omniObj, UniValue& txobj, bool 
     txobj.push_back(Pair("propertyiddesiredisdivisible", propertyIdDesiredIsDivisible));
     txobj.push_back(Pair("amountdesired", FormatMP(metaObj.getDesProperty(), metaObj.getAmountDesired())));
     txobj.push_back(Pair("unitprice", unitPriceStr));
-    if (extendedDetails) populateRPCExtendedTypeMetaDExTrade(omniObj.getHash(), omniObj.getProperty(), omniObj.getAmount(), txobj);
+    if (extendedDetails)
+        populateRPCExtendedTypeMetaDExTrade(omniObj.getHash(), omniObj.getProperty(), omniObj.getAmount(), txobj);
 }
 
 void populateRPCTypeMetaDExCancelPrice(CMPTransaction& omniObj, UniValue& txobj, bool extendedDetails)
@@ -392,7 +448,8 @@ void populateRPCTypeMetaDExCancelPrice(CMPTransaction& omniObj, UniValue& txobj,
     txobj.push_back(Pair("propertyiddesiredisdivisible", propertyIdDesiredIsDivisible));
     txobj.push_back(Pair("amountdesired", FormatMP(metaObj.getDesProperty(), metaObj.getAmountDesired())));
     txobj.push_back(Pair("unitprice", unitPriceStr));
-    if (extendedDetails) populateRPCExtendedTypeMetaDExCancel(omniObj.getHash(), txobj);
+    if (extendedDetails)
+        populateRPCExtendedTypeMetaDExCancel(omniObj.getHash(), txobj);
 }
 
 void populateRPCTypeMetaDExCancelPair(CMPTransaction& omniObj, UniValue& txobj, bool extendedDetails)
@@ -402,13 +459,15 @@ void populateRPCTypeMetaDExCancelPair(CMPTransaction& omniObj, UniValue& txobj, 
     // populate
     txobj.push_back(Pair("propertyidforsale", (uint64_t)omniObj.getProperty()));
     txobj.push_back(Pair("propertyiddesired", (uint64_t)metaObj.getDesProperty()));
-    if (extendedDetails) populateRPCExtendedTypeMetaDExCancel(omniObj.getHash(), txobj);
+    if (extendedDetails)
+        populateRPCExtendedTypeMetaDExCancel(omniObj.getHash(), txobj);
 }
 
 void populateRPCTypeMetaDExCancelEcosystem(CMPTransaction& omniObj, UniValue& txobj, bool extendedDetails)
 {
     txobj.push_back(Pair("ecosystem", strEcosystem(omniObj.getEcosystem())));
-    if (extendedDetails) populateRPCExtendedTypeMetaDExCancel(omniObj.getHash(), txobj);
+    if (extendedDetails)
+        populateRPCExtendedTypeMetaDExCancel(omniObj.getHash(), txobj);
 }
 
 void populateRPCTypeAcceptOffer(CMPTransaction& omniObj, UniValue& txobj)
@@ -424,7 +483,8 @@ void populateRPCTypeAcceptOffer(CMPTransaction& omniObj, UniValue& txobj)
 
     LOCK(cs_tally);
     bool tmpValid = p_txlistdb->getValidMPTX(omniObj.getHash(), &tmpblock, &tmptype, &amountNew);
-    if (tmpValid && amountNew > 0) amount = amountNew;
+    if (tmpValid && amountNew > 0)
+        amount = amountNew;
 
     txobj.push_back(Pair("propertyid", (uint64_t)propertyId));
     txobj.push_back(Pair("divisible", isPropertyDivisible(propertyId)));
@@ -437,7 +497,7 @@ void populateRPCTypeCreatePropertyFixed(CMPTransaction& omniObj, UniValue& txobj
     if (confirmations > 0) {
         uint32_t propertyId = _my_sps->findSPByTX(omniObj.getHash());
         if (propertyId > 0) {
-            txobj.push_back(Pair("propertyid", (uint64_t) propertyId));
+            txobj.push_back(Pair("propertyid", (uint64_t)propertyId));
             txobj.push_back(Pair("divisible", isPropertyDivisible(propertyId)));
         }
     }
@@ -458,7 +518,7 @@ void populateRPCTypeCreatePropertyVariable(CMPTransaction& omniObj, UniValue& tx
     if (confirmations > 0) {
         uint32_t propertyId = _my_sps->findSPByTX(omniObj.getHash());
         if (propertyId > 0) {
-            txobj.push_back(Pair("propertyid", (uint64_t) propertyId));
+            txobj.push_back(Pair("propertyid", (uint64_t)propertyId));
             txobj.push_back(Pair("divisible", isPropertyDivisible(propertyId)));
         }
     }
@@ -469,7 +529,7 @@ void populateRPCTypeCreatePropertyVariable(CMPTransaction& omniObj, UniValue& tx
     txobj.push_back(Pair("propertyname", omniObj.getSPName()));
     txobj.push_back(Pair("data", omniObj.getSPData()));
     txobj.push_back(Pair("url", omniObj.getSPUrl()));
-    txobj.push_back(Pair("propertyiddesired", (uint64_t) omniObj.getProperty()));
+    txobj.push_back(Pair("propertyiddesired", (uint64_t)omniObj.getProperty()));
     std::string strPerUnit = FormatMP(omniObj.getProperty(), omniObj.getAmount());
     txobj.push_back(Pair("tokensperunit", strPerUnit));
     txobj.push_back(Pair("deadline", omniObj.getDeadline()));
@@ -485,7 +545,7 @@ void populateRPCTypeCreatePropertyManual(CMPTransaction& omniObj, UniValue& txob
     if (confirmations > 0) {
         uint32_t propertyId = _my_sps->findSPByTX(omniObj.getHash());
         if (propertyId > 0) {
-            txobj.push_back(Pair("propertyid", (uint64_t) propertyId));
+            txobj.push_back(Pair("propertyid", (uint64_t)propertyId));
             txobj.push_back(Pair("divisible", isPropertyDivisible(propertyId)));
         }
     }
@@ -532,28 +592,28 @@ void populateRPCTypeChangeIssuer(CMPTransaction& omniObj, UniValue& txobj)
 
 void populateRPCTypeActivation(CMPTransaction& omniObj, UniValue& txobj)
 {
-    txobj.push_back(Pair("featureid", (uint64_t) omniObj.getFeatureId()));
-    txobj.push_back(Pair("activationblock", (uint64_t) omniObj.getActivationBlock()));
-    txobj.push_back(Pair("minimumversion", (uint64_t) omniObj.getMinClientVersion()));
+    txobj.push_back(Pair("featureid", (uint64_t)omniObj.getFeatureId()));
+    txobj.push_back(Pair("activationblock", (uint64_t)omniObj.getActivationBlock()));
+    txobj.push_back(Pair("minimumversion", (uint64_t)omniObj.getMinClientVersion()));
 }
 
 void populateRPCTypeEnableFreezing(CMPTransaction& omniObj, UniValue& txobj)
 {
-    txobj.push_back(Pair("propertyid", (uint64_t) omniObj.getProperty()));
+    txobj.push_back(Pair("propertyid", (uint64_t)omniObj.getProperty()));
 }
 
 void populateRPCTypeDisableFreezing(CMPTransaction& omniObj, UniValue& txobj)
 {
-    txobj.push_back(Pair("propertyid", (uint64_t) omniObj.getProperty()));
+    txobj.push_back(Pair("propertyid", (uint64_t)omniObj.getProperty()));
 }
 void populateRPCTypeFreezeTokens(CMPTransaction& omniObj, UniValue& txobj)
 {
-    txobj.push_back(Pair("propertyid", (uint64_t) omniObj.getProperty()));
+    txobj.push_back(Pair("propertyid", (uint64_t)omniObj.getProperty()));
 }
 
 void populateRPCTypeUnfreezeTokens(CMPTransaction& omniObj, UniValue& txobj)
 {
-    txobj.push_back(Pair("propertyid", (uint64_t) omniObj.getProperty()));
+    txobj.push_back(Pair("propertyid", (uint64_t)omniObj.getProperty()));
 }
 
 void populateRPCExtendedTypeSendToOwners(const uint256 txid, std::string extendedDetailsFilter, UniValue& txobj, uint16_t version)
@@ -597,11 +657,12 @@ void populateRPCExtendedTypeMetaDExCancel(const uint256& txid, UniValue& txobj)
     UniValue cancelArray(UniValue::VARR);
     LOCK(cs_tally);
     int numberOfCancels = p_txlistdb->getNumberOfMetaDExCancels(txid);
-    if (0<numberOfCancels) {
-        for(int refNumber = 1; refNumber <= numberOfCancels; refNumber++) {
+    if (0 < numberOfCancels) {
+        for (int refNumber = 1; refNumber <= numberOfCancels; refNumber++) {
             UniValue cancelTx(UniValue::VOBJ);
-            std::string strValue = p_txlistdb->getKeyValue(txid.ToString() + "-C" + strprintf("%d",refNumber));
-            if (strValue.empty()) continue;
+            std::string strValue = p_txlistdb->getKeyValue(txid.ToString() + "-C" + strprintf("%d", refNumber));
+            if (strValue.empty())
+                continue;
             std::vector<std::string> vstr;
             boost::split(vstr, strValue, boost::is_any_of(":"), boost::token_compress_on);
             if (vstr.size() != 3) {
@@ -611,7 +672,7 @@ void populateRPCExtendedTypeMetaDExCancel(const uint256& txid, UniValue& txobj)
             uint32_t propId = boost::lexical_cast<uint32_t>(vstr[1]);
             int64_t amountUnreserved = boost::lexical_cast<int64_t>(vstr[2]);
             cancelTx.push_back(Pair("txid", vstr[0]));
-            cancelTx.push_back(Pair("propertyid", (uint64_t) propId));
+            cancelTx.push_back(Pair("propertyid", (uint64_t)propId));
             cancelTx.push_back(Pair("amountunreserved", FormatMP(propId, amountUnreserved)));
             cancelArray.push_back(cancelTx);
         }
@@ -672,9 +733,11 @@ int populateRPCDExPurchases(const CTransaction& wtx, UniValue& purchases, std::s
             LOCK(cs_tally);
             p_txlistdb->getPurchaseDetails(wtx.GetHash(), purchaseNumber, &buyer, &seller, &vout, &propertyId, &nValue);
         }
-        if (!filterAddress.empty() && buyer != filterAddress && seller != filterAddress) continue; // filter requested & doesn't match
+        if (!filterAddress.empty() && buyer != filterAddress && seller != filterAddress)
+            continue; // filter requested & doesn't match
         bool bIsMine = false;
-        if (IsMyAddress(buyer) || IsMyAddress(seller)) bIsMine = true;
+        if (IsMyAddress(buyer) || IsMyAddress(seller))
+            bIsMine = true;
         int64_t amountPaid = wtx.vout[vout].nValue;
         purchaseObj.push_back(Pair("vout", vout));
         purchaseObj.push_back(Pair("amountpaid", FormatDivisibleMP(amountPaid)));
