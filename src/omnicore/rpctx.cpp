@@ -318,7 +318,7 @@ UniValue omni_pending_add(const UniValue& params, bool fHelp)
             "\nExamples:\n" + HelpExampleCli("omni_pending_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"") + HelpExampleRpc("omni_pending_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\""));
 
     // obtain parameters & info
-    std::vector<unsigned char> vecTxHash = ParseHex(params[0].get_str());
+    uint256 vecTxHash = uint256S(params[0].get_str());
     std::string fromAddress = params[1].getValStr();
     uint16_t pendingType = (uint16_t)params[2].get_int();
     uint32_t propertyId = ParsePropertyId(params[3]);
@@ -334,7 +334,7 @@ UniValue omni_pending_add(const UniValue& params, bool fHelp)
     RequireExistingProperty(propertyId);
     RequireBalance(fromAddress, propertyId, amount);
 
-    PendingAdd(uint256(vecTxHash), fromAddress, pendingType, propertyId, amount, fSubtract);
+    PendingAdd(vecTxHash, fromAddress, pendingType, propertyId, amount, fSubtract);
 
     return "";
 }
