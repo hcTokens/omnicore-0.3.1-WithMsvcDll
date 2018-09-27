@@ -180,6 +180,17 @@ UniValue omni_sendrawtx(const UniValue& params, bool fHelp)
 	*/
 }
 
+UniValue omni_clear(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error("omni_clear ()");
+
+	clear_all_state(); 
+	PrintToConsole("clear all omni data");
+
+	return "";
+}
+
 UniValue omni_send(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 4 || params.size() > 6)
@@ -249,6 +260,31 @@ UniValue omni_send(const UniValue& params, bool fHelp)
     }
 	*/
 }
+
+
+UniValue omni_padding_add(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 4 || params.size() > 6)
+        throw runtime_error(
+            "\nExamples:\n" + HelpExampleCli("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\" \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\" 1 \"100.0\"") + HelpExampleRpc("omni_padding_add", "\"3M9qvHKtgARhqcMtM5cRT9VaiDJ5PSfQGY\", \"37FaKponF7zqoMLUjEiko25pDiuVH5YLEa\", 1, \"100.0\""));
+
+    // obtain parameters & info
+    std::string fromAddress = params[0].getValStr();
+    uint32_t propertyId = ParsePropertyId(params[1]);
+    int64_t amount = ParseAmount(params[2], isPropertyDivisible(propertyId));
+    std::vector<unsigned char> vecTxHash = ParseHex(params[3].get_str());
+
+    // perform checks
+    RequireExistingProperty(propertyId);
+    RequireBalance(fromAddress, propertyId, amount);
+
+    PendingAdd(uint256(vecTxHash), fromAddress, params[4].get_int(), propertyId, amount);
+
+    printf("omni_padding_add %d txhash = %I64d      1111111111111111\n", uint256(vecTxHash).GetCheapHash());
+
+    return "";
+}
+
 
 UniValue omni_sendall(const UniValue& params, bool fHelp)
 {
@@ -1588,6 +1624,7 @@ static const CRPCCommand commands[] =
         {"omni layer (transaction creation)", "omni_funded_sendall", &omni_funded_sendall, false},
         {"omni layer (transaction creation)", "omni_readalltxhash", &omni_readalltxhash, false},
         {"omni layer (transaction creation)", "omni_rollback", &omni_rollback, false},
+        {"omni layer (transaction creation)", "omni_clear", &omni_clear, false},        
 
         {"omni layer (transaction creation)", "omni_pending_add", &omni_pending_add, false},
         /* depreciated: */

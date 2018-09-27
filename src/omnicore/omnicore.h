@@ -162,6 +162,7 @@ int mastercore_handler_block_begin(int nBlockNow, CBlockIndex const * pBlockInde
 int mastercore_handler_block_end(int nBlockNow, CBlockIndex const * pBlockIndex, unsigned int);
 bool mastercore_handler_tx(const CTransaction& tx, int nBlock, unsigned int idx, const CBlockIndex* pBlockIndex);
 bool mastercore_handler_mptx(const UniValue &root);
+void clear_all_state();
 
 /** Global handler to total wallet balances. */
 void CheckWalletUpdate(bool forceUpdate = false);

@@ -1510,6 +1510,9 @@ static int msc_initial_scan(int nFirstBlock)
  */
 void clear_all_state()
 {
+    if (mastercoreInitialized == false)
+        return;
+
     LOCK2(cs_tally, cs_pending);
 
     // Memory based storage
@@ -1679,10 +1682,10 @@ int mastercore_init()
         PrintToConsole("Loading persistent state: NONE (%s)\n", strReason);
     }
 
-    if (nWaterlineBlock < 0) {
+   // if (nWaterlineBlock < 0) {
         // persistence says we reparse!, nuke some stuff in case the partial loads left stale bits
-        //clear_all_state();
-    }
+      clear_all_state();
+    //}
 
     // legacy code, setting to pre-genesis-block
     int snapshotHeight = ConsensusParams().GENESIS_BLOCK - 1;
@@ -1800,6 +1803,9 @@ int mastercore_init_ex()
     TryCreateDirectory(MPPersistencePath);
 
     ++mastercoreInitialized;
+
+	clear_all_state();
+
 	/*
     nWaterlineBlock = LoadMostRelevantInMemoryState();
 	
