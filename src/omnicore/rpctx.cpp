@@ -1078,7 +1078,7 @@ UniValue omni_sendcanceltradesbyprice(const UniValue& params, bool fHelp)
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_MetaDExCancelPrice(propertyIdForSale, amountForSale, propertyIdDesired, amountDesired);
-    PayLoadWrap(payload);
+    return PayLoadWrap(payload);
 	/*
     // request the wallet build the transaction (and if needed commit it)
     uint256 txid;

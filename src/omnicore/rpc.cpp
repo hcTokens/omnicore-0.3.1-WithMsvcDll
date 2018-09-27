@@ -2289,6 +2289,7 @@ UniValue omni_gettrade(const UniValue& params, bool fHelp)
             + HelpExampleCli("omni_gettrade", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\"")
             + HelpExampleRpc("omni_gettrade", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\"")
         );
+    throw runtime_error("not implement");
 
     uint256 hash = ParseHashV(params[0], "txid");
 

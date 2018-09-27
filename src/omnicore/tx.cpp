@@ -1644,6 +1644,7 @@ int CMPTransaction::logicMath_CreatePropertyFixed()
 /** Tx 51 */
 int CMPTransaction::logicMath_CreatePropertyVariable()
 {
+    /*
     uint256 blockHash;
     {
         LOCK(cs_main);
@@ -1655,6 +1656,7 @@ int CMPTransaction::logicMath_CreatePropertyVariable()
         }
         blockHash = pindex->GetBlockHash();
     }
+	*/
 
     if (OMNI_PROPERTY_MSC != ecosystem && OMNI_PROPERTY_TMSC != ecosystem) {
         PrintToLog("%s(): rejected: invalid ecosystem: %d\n", __func__, (uint32_t) ecosystem);
@@ -1731,7 +1733,7 @@ int CMPTransaction::logicMath_CreatePropertyVariable()
     newSP.deadline = deadline;
     newSP.early_bird = early_bird;
     newSP.percentage = percentage;
-    newSP.creation_block = blockHash;
+    newSP.creation_block = _blockHash; //blockHash;
     newSP.update_block = newSP.creation_block;
 
     const uint32_t propertyId = _my_sps->putSP(ecosystem, newSP);
@@ -1746,6 +1748,7 @@ int CMPTransaction::logicMath_CreatePropertyVariable()
 /** Tx 53 */
 int CMPTransaction::logicMath_CloseCrowdsale()
 {
+    /*
     uint256 blockHash;
     {
         LOCK(cs_main);
@@ -1757,6 +1760,7 @@ int CMPTransaction::logicMath_CloseCrowdsale()
         }
         blockHash = pindex->GetBlockHash();
     }
+	*/
 
     if (!IsTransactionTypeAllowed(block, property, type, version)) {
         PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
@@ -1793,7 +1797,7 @@ int CMPTransaction::logicMath_CloseCrowdsale()
     int64_t missedTokens = GetMissedIssuerBonus(sp, crowd);
 
     sp.historicalData = crowd.getDatabase();
-    sp.update_block = blockHash;
+    sp.update_block = _blockHash;
     sp.close_early = true;
     sp.timeclosed = blockTime;
     sp.txid_close = txid;
