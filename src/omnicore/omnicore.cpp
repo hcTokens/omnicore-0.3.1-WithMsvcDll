@@ -5,6 +5,7 @@
  */
 
 #include "omnicore/omnicore.h"
+#include "omnicore/dbTxHistory.h"
 
 #include "omnicore/activation.h"
 #include "omnicore/consensushash.h"
@@ -134,6 +135,8 @@ COmniTransactionDB* mastercore::p_OmniTXDB;
 COmniFeeCache* mastercore::p_feecache;
 //! LevelDB based storage for the MetaDEx fee distributions
 COmniFeeHistory* mastercore::p_feehistory;
+//! LevelDB based storage for the TxHistory
+COmniTxHistory* mastercore::p_txhistory;
 
 //! In-memory collection of DEx offers
 OfferMap mastercore::my_offers;
@@ -1529,6 +1532,7 @@ void clear_all_state()
     p_OmniTXDB->Clear();
     p_feecache->Clear();
     p_feehistory->Clear();
+	p_txhistory->Clear();
     assert(p_txlistdb->setDBVersion() == DB_VERSION); // new set of databases, set DB version
     exodus_prev = 0;
 }
@@ -1641,6 +1645,8 @@ int mastercore_init()
     p_OmniTXDB = new COmniTransactionDB(GetDataDir() / "Omni_TXDB", fReindex);
     p_feecache = new COmniFeeCache(GetDataDir() / "OMNI_feecache", fReindex);
     p_feehistory = new COmniFeeHistory(GetDataDir() / "OMNI_feehistory", fReindex);
+	p_txhistory = new COmniTxHistory(GetDataDir() / "OMNI_txhistory", fReindex);
+	
 
     MPPersistencePath = GetDataDir() / "MP_persist";
     TryCreateDirectory(MPPersistencePath);
@@ -1788,6 +1794,7 @@ int mastercore_init_ex()
     p_OmniTXDB = new COmniTransactionDB(GetDataDir() / "Omni_TXDB", fReindex);
     p_feecache = new COmniFeeCache(GetDataDir() / "OMNI_feecache", fReindex);
     p_feehistory = new COmniFeeHistory(GetDataDir() / "OMNI_feehistory", fReindex);
+	p_txhistory = new COmniTxHistory(GetDataDir() / "OMNI_txhistory", fReindex);
 
     MPPersistencePath = GetDataDir() / "MP_persist";
     TryCreateDirectory(MPPersistencePath);
@@ -1902,7 +1909,10 @@ int mastercore_shutdown()
         delete p_feehistory;
         p_feehistory = NULL;
     }
-
+	if (p_txhistory) {
+        delete p_txhistory;
+        p_txhistory = NULL;
+    }
     mastercoreInitialized = 0;
 
     PrintToLog("\nOmni Core shutdown completed\n");
@@ -2006,6 +2016,19 @@ bool mastercore_handler_mptx(const UniValue &root)
     mp_obj.SetBlockHash(vecBlockHash);
     mp_obj.Set(Sender, Reference, Block, vecTxHash, Block, Idx, &(Script[0]), Script.size(), 3, Fee);
 
+	UniValue value(UniValue::VOBJ);
+    value.push_back(Pair("Sender", Sender));
+	value.push_back(Pair("Reference", Reference));
+	value.push_back(Pair("TxHash", vecTxHash.ToString()));
+	value.push_back(Pair("BlockHash", vecBlockHash.ToString()));
+	value.push_back(Pair("Block", Block));
+	value.push_back(Pair("Idx", Idx));
+	value.push_back(Pair("PayLoad", ScriptEncode));
+	value.push_back(Pair("Fee", Fee));
+	value.push_back(Pair("Time", Time));
+	value.push_back(Pair("Type", (int)mp_obj.getType()));
+
+	p_txhistory->PutHistory(value.write());
     if (!mastercoreInitialized) {
         mastercore_init();
     }

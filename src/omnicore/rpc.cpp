@@ -14,6 +14,7 @@
 #include "omnicore/dbstolist.h"
 #include "omnicore/dbtradelist.h"
 #include "omnicore/dbtxlist.h"
+#include "omnicore/dbTxHistory.h"
 #include "omnicore/dex.h"
 #include "omnicore/errors.h"
 #include "omnicore/log.h"
@@ -471,6 +472,7 @@ UniValue omni_getfeecache(const UniValue& params, bool fHelp)
 // generate a list of seed blocks based on the data in LevelDB
 UniValue omni_getseedblocks(const UniValue& params, bool fHelp)
 {
+	throw runtime_error("not implement");
     if (fHelp || params.size() != 2)
         throw runtime_error(
             "omni_getseedblocks startblock endblock\n"
@@ -511,7 +513,7 @@ UniValue omni_getseedblocks(const UniValue& params, bool fHelp)
 // obtain the payload for a transaction
 UniValue omni_getpayload(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 1)
+	if (fHelp || params.size() != 1)
         throw runtime_error(
             "omni_getpayload \"txid\"\n"
             "\nGet the payload for an Omni transaction.\n"
@@ -529,25 +531,29 @@ UniValue omni_getpayload(const UniValue& params, bool fHelp)
 
     uint256 txid = ParseHashV(params[0], "txid");
 
-    CTransaction tx;
-    uint256 blockHash;
-    if (!GetTransaction(txid, tx, Params().GetConsensus(), blockHash, true)) {
-        PopulateFailure(MP_TX_NOT_FOUND);
-    }
+	std::string history;
+	int i=1;
+	UniValue txobj;
+	do {
+		history = p_txhistory->GetHistory(i++);
+		txobj.read(history);
+		if(uint256S(txobj["TxHash"].getValStr()) == txid)
+		{
+			break;
+		}
+	} while (!history.empty());
 
-    int blockTime = 0;
-    int blockHeight = GetHeight();
-    if (!blockHash.IsNull()) {
-        CBlockIndex* pBlockIndex = GetBlockIndex(blockHash);
-        if (NULL != pBlockIndex) {
-            blockTime = pBlockIndex->nTime;
-            blockHeight = pBlockIndex->nHeight;
-        }
-    }
+	std::string ScriptEncode = txobj["PayLoad"].get_str();
+    std::vector<unsigned char> Script = ParseHex(ScriptEncode);
 
-    CMPTransaction mp_obj;
-    int parseRC = ParseTransaction(tx, blockHeight, 0, mp_obj, blockTime);
-    if (parseRC < 0) PopulateFailure(MP_TX_IS_NOT_MASTER_PROTOCOL);
+	CMPTransaction mp_obj;
+	mp_obj.unlockLogic();
+    mp_obj.Set(uint256S(txobj["TxHash"].getValStr()), txobj["Block"].get_int(), txobj["Idx"].get_int(), txobj["Time"].get_int64());
+    mp_obj.SetBlockHash(uint256S(txobj["BlockHash"].getValStr()));
+    mp_obj.Set(txobj["Sender"].getValStr(),	txobj["Reference"].getValStr(),
+		txobj["Block"].get_int(), uint256S(txobj["TxHash"].getValStr()),
+		txobj["Block"].get_int(), txobj["Idx"].get_int(),
+		&(Script[0]), Script.size(), 3, txobj["Fee"].get_int());
 
     UniValue payloadObj(UniValue::VOBJ);
     payloadObj.push_back(Pair("payload", mp_obj.getPayload()));
@@ -858,7 +864,7 @@ UniValue omni_getallbalancesforaddress(const UniValue& params, bool fHelp)
             + HelpExampleRpc("omni_getallbalancesforaddress", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\"")
         );
 
-    std::string address = ParseAddress(params[0]);
+    std::string address = ParseText(params[0]);
 
     UniValue response(UniValue::VARR);
 
@@ -899,7 +905,6 @@ static std::set<std::string> getWalletAddresses(bool fIncludeWatchOnly)
     std::set<std::string> result;
 
 #ifdef ENABLE_WALLET
-    LOCK(pwalletMain->cs_wallet);
 
     BOOST_FOREACH(const PAIRTYPE(CTxDestination, CAddressBookData)& item, pwalletMain->mapAddressBook) {
         const CBitcoinAddress& address = item.first;
@@ -946,9 +951,6 @@ UniValue omni_getwalletbalances(const UniValue& params, bool fHelp)
     UniValue response(UniValue::VARR);
 
 #ifdef ENABLE_WALLET
-    if (!pwalletMain) {
-        return response;
-    }
 
     std::set<std::string> addresses = getWalletAddresses(fIncludeWatchOnly);
     std::map<uint32_t, std::tuple<int64_t, int64_t, int64_t>> balances;
@@ -1060,9 +1062,6 @@ UniValue omni_getwalletaddressbalances(const UniValue& params, bool fHelp)
     UniValue response(UniValue::VARR);
 
 #ifdef ENABLE_WALLET
-    if (!pwalletMain) {
-        return response;
-    }
 
     std::set<std::string> addresses = getWalletAddresses(fIncludeWatchOnly);
 
@@ -1108,7 +1107,7 @@ UniValue omni_getwalletaddressbalances(const UniValue& params, bool fHelp)
 
 UniValue omni_getproperty(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 1)
+    if (fHelp || params.size() > 2 || params.size() == 1)
         throw runtime_error(
             "omni_getproperty propertyid\n"
             "\nReturns details for about the tokens or smart property to lookup.\n"
@@ -1135,7 +1134,7 @@ UniValue omni_getproperty(const UniValue& params, bool fHelp)
         );
 
     uint32_t propertyId = ParsePropertyId(params[0]);
-
+    uint32_t currentHeight = params[1].get_int64();
     RequireExistingProperty(propertyId);
 
     CMPSPInfo::Entry sp;
@@ -1157,13 +1156,12 @@ UniValue omni_getproperty(const UniValue& params, bool fHelp)
     response.push_back(Pair("fixedissuance", sp.fixed));
     response.push_back(Pair("managedissuance", sp.manual));
     if (sp.manual) {
-        int currentBlock = GetHeight();
         LOCK(cs_tally);
-        response.push_back(Pair("freezingenabled", isFreezingEnabled(propertyId, currentBlock)));
+        response.push_back(Pair("freezingenabled", isFreezingEnabled(propertyId, currentHeight)));
     }
     response.push_back(Pair("totaltokens", strTotalTokens));
 
-    return response;
+    return response; 
 }
 
 UniValue omni_listproperties(const UniValue& params, bool fHelp)
@@ -1902,7 +1900,7 @@ UniValue omni_gettransaction(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "omni_gettransaction \"txid\"\n"
+            "\ \"txid\"\n"
             "\nGet detailed information about an Omni transaction.\n"
             "\nArguments:\n"
             "1. txid                 (string, required) the hash of the transaction to lookup\n"
@@ -1930,9 +1928,18 @@ UniValue omni_gettransaction(const UniValue& params, bool fHelp)
     uint256 hash = ParseHashV(params[0], "txid");
 
     UniValue txobj(UniValue::VOBJ);
-    int populateResult = populateRPCTransactionObject(hash, txobj);
-    if (populateResult != 0) PopulateFailure(populateResult);
 
+	std::string history;
+	int i=1;
+
+	do {
+		history = p_txhistory->GetHistory(i++);
+		txobj.read(history);
+		if(uint256S(txobj["TxHash"].getValStr()) == (hash))
+		{
+			break;
+		}
+	} while (!history.empty());
     return txobj;
 }
 
@@ -2492,6 +2499,28 @@ UniValue omni_processtx(const UniValue& params, bool fHelp)
     return "fail";
 }
 
+UniValue omni_processpayment(const UniValue& params, bool fHelp)
+{
+    //Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee
+    int len = params.size();
+
+    if (fHelp || params.size() != 9)
+        throw runtime_error(
+            "omni_processpayment\n"
+            "\nExamples:\n" +
+            HelpExampleCli("omni_processpayment", "000000fff3d3322faddd"));
+
+	std::string Sender = params[0].get_str();
+    std::string Reference = params[1].get_str();
+    uint256 vecTxHash = uint256S(params[2].get_str());
+ 	int64_t Amount = params[3].get_int64();
+    int64_t Block = params[4].get_int64();
+    int64_t Idx = params[5].get_int64();
+
+	return DEx_payment(vecTxHash, Idx, Sender, Reference, Amount, Block)? "fail" :"success";
+}
+
+
 static const CRPCCommand commands[] =
 { //  category                             name                            actor (function)               okSafeMode
   //  ------------------------------------ ------------------------------- ------------------------------ ----------
@@ -2523,8 +2552,9 @@ static const CRPCCommand commands[] =
     { "omni layer (data retrieval)", "omni_getfeedistribution",        &omni_getfeedistribution,         false },
     { "omni layer (data retrieval)", "omni_getfeedistributions",       &omni_getfeedistributions,        false },
     { "omni layer (data retrieval)", "omni_getbalanceshash",           &omni_getbalanceshash,            false },
-    { "omni layer (data retrieval)", "omni_dealopreturn",              &omni_dealopreturn,               false},
-	{ "omni layer (data retrieval)", "omni_processtx",                 &omni_processtx,               false},
+    { "omni layer (data retrieval)", "omni_dealopreturn",              &omni_dealopreturn,               false },
+	{ "omni layer (data retrieval)", "omni_processtx",                 &omni_processtx,					 false },
+	{ "omni layer (data retrieval)", "omni_processpayment",            &omni_processpayment,			 false },
 #ifdef ENABLE_WALLET
     { "omni layer (data retrieval)", "omni_listtransactions",          &omni_listtransactions,           false },
     { "omni layer (data retrieval)", "omni_getfeeshare",               &omni_getfeeshare,                false },
