@@ -1863,35 +1863,55 @@ UniValue omni_listblocktransactions(const UniValue& params, bool fHelp)
             + HelpExampleRpc("omni_listblocktransactions", "279007")
         );
 
-    int blockHeight = params[0].get_int();
+	int blockHeight = params[0].get_int();
+	UniValue response(UniValue::VARR);
+	std::string history;
+	int i=1;
+	UniValue txobj;
+	do {
+		history = p_txhistory->GetHistory(i++);
+		if(history.empty())
+			break;
+		txobj.read(history);
+		if(!txobj["Block"].isNull())
+		{
+			if(txobj["Block"].get_int() == blockHeight)
+			{
+				response.push_back(txobj);
+			}
+		}
+	} while (!history.empty());
+    return response;
 
-    RequireHeightInChain(blockHeight);
+    //int blockHeight = params[0].get_int();
 
-    // next let's obtain the block for this height
-    CBlock block;
-    {
-        LOCK(cs_main);
-        CBlockIndex* pBlockIndex = chainActive[blockHeight];
+    //RequireHeightInChain(blockHeight);
 
-        if (!ReadBlockFromDisk(block, pBlockIndex, Params().GetConsensus())) {
-            throw JSONRPCError(RPC_INTERNAL_ERROR, "Failed to read block from disk");
-        }
-    }
+    //// next let's obtain the block for this height
+    //CBlock block;
+    //{
+    //    LOCK(cs_main);
+    //    CBlockIndex* pBlockIndex = chainActive[blockHeight];
 
-    UniValue response(UniValue::VARR);
+    //    if (!ReadBlockFromDisk(block, pBlockIndex, Params().GetConsensus())) {
+    //        throw JSONRPCError(RPC_INTERNAL_ERROR, "Failed to read block from disk");
+    //    }
+    //}
 
-    // now we want to loop through each of the transactions in the block and run against CMPTxList::exists
-    // those that return positive add to our response array
+    //UniValue response(UniValue::VARR);
 
-    LOCK(cs_tally);
+    //// now we want to loop through each of the transactions in the block and run against CMPTxList::exists
+    //// those that return positive add to our response array
 
-    BOOST_FOREACH(const CTransaction&tx, block.vtx) {
-        if (p_txlistdb->exists(tx.GetHash())) {
-            // later we can add a verbose flag to decode here, but for now callers can send returned txids into gettransaction_MP
-            // add the txid into the response as it's an MP transaction
-            response.push_back(tx.GetHash().GetHex());
-        }
-    }
+    //LOCK(cs_tally);
+
+    //BOOST_FOREACH(const CTransaction&tx, block.vtx) {
+    //    if (p_txlistdb->exists(tx.GetHash())) {
+    //        // later we can add a verbose flag to decode here, but for now callers can send returned txids into gettransaction_MP
+    //        // add the txid into the response as it's an MP transaction
+    //        response.push_back(tx.GetHash().GetHex());
+    //    }
+    //}
 
     return response;
 }
