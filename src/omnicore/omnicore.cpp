@@ -89,6 +89,16 @@ using namespace mastercore;
 CCriticalSection cs_tally;
 
 //! Exodus address (changes based on network)
+static std::string exodus_address = "HsXA4B34vrsJLyv3iSRJXMQjUXaCkANUQcB";
+
+//! Mainnet Exodus address
+static const std::string exodus_mainnet = "HsXA4B34vrsJLyv3iSRJXMQjUXaCkANUQcB";
+//! Testnet Exodus address
+static const std::string exodus_testnet = "TsSmoC9HdBhDhq4ut4TqJY7SBjPqJFAPkGK";
+//! Testnet Exodus crowdsale address
+static const std::string getmoney_testnet = "Tsbi4Wq9xG7YHwnqWGV17fFDYBrPvmhr7hg";
+/*
+//! Exodus address (changes based on network)
 static std::string exodus_address = "1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P";
 
 //! Mainnet Exodus address
@@ -97,7 +107,7 @@ static const std::string exodus_mainnet = "1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P";
 static const std::string exodus_testnet = "mpexoDuSkGGqvqrkrjiFng38QPkJQVFyqv";
 //! Testnet Exodus crowdsale address
 static const std::string getmoney_testnet = "moneyqMan7uh8FqdCA2BV5yZ8qVrc9ikLP";
-
+*/
 static int nWaterlineBlock = 0;
 
 /**
