@@ -412,6 +412,8 @@ int64_t CMPMetaDEx::getAmountToFill() const
 int64_t CMPMetaDEx::getBlockTime() const
 {
     CBlockIndex* pblockindex = chainActive[block];
+    if (pblockindex == NULL)
+        return 0;//new added 20180928
     return pblockindex->GetBlockTime();
 }
 
