@@ -943,16 +943,21 @@ UniValue omni_getwalletbalances(const UniValue& params, bool fHelp)
             + HelpExampleRpc("omni_getwalletbalances", "")
         );
 
-    bool fIncludeWatchOnly = false;
+	std::set<std::string> addresses;
     if (params.size() > 0) {
-        fIncludeWatchOnly = params[0].get_bool();
+        if(params[0].isArray())
+		{
+			for (size_t i = 0; i < params[0].size(); i++)
+			{
+				addresses.insert(params[0][i].get_str());
+			}
+		}
     }
 
     UniValue response(UniValue::VARR);
 
 #ifdef ENABLE_WALLET
 
-    std::set<std::string> addresses = getWalletAddresses(fIncludeWatchOnly);
     std::map<uint32_t, std::tuple<int64_t, int64_t, int64_t>> balances;
 
     LOCK(cs_tally);
@@ -1054,16 +1059,21 @@ UniValue omni_getwalletaddressbalances(const UniValue& params, bool fHelp)
             + HelpExampleRpc("omni_getwalletaddressbalances", "")
         );
 
-    bool fIncludeWatchOnly = false;
+    std::set<std::string> addresses;
     if (params.size() > 0) {
-        fIncludeWatchOnly = params[0].get_bool();
+        if(params[0].isArray())
+		{
+			for (size_t i = 0; i < params[0].size(); i++)
+			{
+				addresses.insert(params[0][i].get_str());
+			}
+		}
     }
 
     UniValue response(UniValue::VARR);
 
 #ifdef ENABLE_WALLET
 
-    std::set<std::string> addresses = getWalletAddresses(fIncludeWatchOnly);
 
     LOCK(cs_tally);
     BOOST_FOREACH(const std::string& address, addresses) {
@@ -1849,7 +1859,7 @@ UniValue omni_getactivedexsells(const UniValue& params, bool fHelp)
 
 UniValue omni_listblocktransactions(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 1)
+    if (fHelp || params.size() != 2)
         throw runtime_error(
             "omni_listblocktransactions index\n"
             "\nLists all Omni transactions in a block.\n"
@@ -1867,6 +1877,18 @@ UniValue omni_listblocktransactions(const UniValue& params, bool fHelp)
         );
 
 	int blockHeight = params[0].get_int();
+
+	std::set<std::string> addresses;
+    if (params.size() > 1) {
+        if(params[1].isArray())
+		{
+			for (size_t i = 0; i < params[1].size(); i++)
+			{
+				addresses.insert(params[1][i].get_str());
+			}
+		}
+    }
+
 	UniValue response(UniValue::VARR);
 	std::string history;
 	int i=1;
@@ -1878,9 +1900,16 @@ UniValue omni_listblocktransactions(const UniValue& params, bool fHelp)
 		txobj.read(history);
 		if(!txobj["Block"].isNull())
 		{
-			if(txobj["Block"].get_int() == blockHeight)
+			if(txobj["Block"].get_int() == blockHeight )
 			{
-				response.push_back(txobj);
+				for (std::set<std::string>::iterator itr = addresses.begin(); itr != addresses.end(); itr++)
+				{
+					if(txobj["Sender"].getValStr() == *itr ||
+						txobj["Reference"].getValStr() == *itr)
+					{
+						response.push_back(txobj);
+					}
+				}
 			}
 		}
 	} while (!history.empty());
@@ -2047,23 +2076,48 @@ UniValue omni_listpendingtransactions(const UniValue& params, bool fHelp)
             + HelpExampleRpc("omni_listpendingtransactions", "")
         );
 
-    std::string filterAddress;
+    std::set<std::string> addresses;
     if (params.size() > 0) {
-        filterAddress = ParseAddressOrEmpty(params[0]);
+        if(params[0].isArray())
+		{
+			for (size_t i = 0; i < params[0].size(); i++)
+			{
+				addresses.insert(params[0][i].get_str());
+			}
+		}
     }
 
-    std::vector<uint256> vTxid;
-    mempool.queryHashes(vTxid);
+	UniValue response(UniValue::VARR);
+	for(PendingMap::iterator mapitr = my_pending.begin(); mapitr != my_pending.end(); mapitr++)
+	{
+		for (std::set<std::string>::iterator itr = addresses.begin(); itr != addresses.end(); itr++)
+		{
+			if (*itr == mapitr->second.src)
+			{
+				UniValue value(UniValue::VOBJ);
+				value.push_back(Pair("txid", mapitr->first.ToString()));
+				value.push_back(Pair("address", *itr));
+				value.push_back(Pair("prop", (int64_t)mapitr->second.prop));
+				value.push_back(Pair("amount", (int64_t)mapitr->second.amount));
+				value.push_back(Pair("type", (int64_t)mapitr->second.type));
+				response.push_back(value);
+			}
+		}
+	}
+    return response;
 
-    UniValue result(UniValue::VARR);
-    BOOST_FOREACH(const uint256& hash, vTxid) {
-        UniValue txObj(UniValue::VOBJ);
-        if (populateRPCTransactionObject(hash, txObj, filterAddress) == 0) {
-            result.push_back(txObj);
-        }
-    }
+    //std::vector<uint256> vTxid;
+    //mempool.queryHashes(vTxid);
 
-    return result;
+    //UniValue result(UniValue::VARR);
+    //BOOST_FOREACH(const uint256& hash, vTxid) {
+    //    UniValue txObj(UniValue::VOBJ);
+    //    if (populateRPCTransactionObject(hash, txObj, filterAddress) == 0) {
+    //        result.push_back(txObj);
+    //    }
+    //}
+
+    //return result;
 }
 
 UniValue omni_getinfo(const UniValue& params, bool fHelp)
