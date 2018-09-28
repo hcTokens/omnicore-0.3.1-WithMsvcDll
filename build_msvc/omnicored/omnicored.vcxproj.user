@@ -5,4 +5,9 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(GOPATH)\src\github.com\HcashOrg\hcwallet\hcwallet.exe</LocalDebuggerCommand>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommand>$(GOPATH)\src\github.com\HcashOrg\hcwallet\hcwallet.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>--testnet -u admin -P 123 --hcusername admin --walletpass 123 --hcpassword 123</LocalDebuggerCommandArguments>
+  </PropertyGroup>
 </Project>
