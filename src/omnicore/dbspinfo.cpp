@@ -55,7 +55,7 @@ CMPSPInfo::CMPSPInfo(const boost::filesystem::path& path, bool fWipe)
     PrintToConsole("Loading smart property database: %s\n", status.ToString());
 
     // special cases for constant SPs OMNI and TOMNI
-    implied_omni.issuer = ExodusAddress().ToString();
+    implied_omni.issuer = ExodusAddress();
     implied_omni.prop_type = MSC_PROPERTY_TYPE_DIVISIBLE;
     implied_omni.num_tokens = 700000;
     implied_omni.category = "N/A";
@@ -63,7 +63,7 @@ CMPSPInfo::CMPSPInfo(const boost::filesystem::path& path, bool fWipe)
     implied_omni.name = "Omni";
     implied_omni.url = "http://www.omnilayer.org";
     implied_omni.data = "Omni serve as the binding between Bitcoin, smart properties and contracts created on the Omni Layer.";
-    implied_tomni.issuer = ExodusAddress().ToString();
+    implied_tomni.issuer = ExodusAddress();
     implied_tomni.prop_type = MSC_PROPERTY_TYPE_DIVISIBLE;
     implied_tomni.num_tokens = 700000;
     implied_tomni.category = "N/A";

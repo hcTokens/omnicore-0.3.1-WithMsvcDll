@@ -48,6 +48,9 @@ int WalletTxBuilder(
         std::string& retRawTx,
         bool commit)
 {
+	assert(0);
+	return 0;
+	/*
 #ifdef ENABLE_WALLET
     if (pwalletMain == NULL) return MP_ERR_WALLET_ACCESS;
 
@@ -123,7 +126,7 @@ int WalletTxBuilder(
 #else
     return MP_ERR_WALLET_ACCESS;
 #endif
-
+*/
 }
 
 #ifdef ENABLE_WALLET

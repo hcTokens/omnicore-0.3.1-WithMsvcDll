@@ -118,7 +118,7 @@ std::string FormatMP(uint32_t propertyId, int64_t amount, bool fSign = false);
 std::string FormatShortMP(uint32_t propertyId, int64_t amount);
 
 /** Returns the Exodus address. */
-const CBitcoinAddress ExodusAddress();
+const std::string& ExodusAddress();
 
 /** Returns the Exodus crowdsale address. */
 const CBitcoinAddress ExodusCrowdsaleAddress(int nBlock = 0);
