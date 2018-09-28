@@ -1410,6 +1410,7 @@ UniValue omni_getactivecrowdsales(const UniValue& params, bool fHelp)
             continue;
         }
 
+		/*
         const uint256& creationHash = sp.txid;
 
         CTransaction tx;
@@ -1422,6 +1423,8 @@ UniValue omni_getactivecrowdsales(const UniValue& params, bool fHelp)
         if (!hashBlock.IsNull() && GetBlockIndex(hashBlock)) {
             startTime = GetBlockIndex(hashBlock)->nTime;
         }
+		*/
+        int64_t startTime = -1;
 
         UniValue responseObj(UniValue::VOBJ);
         responseObj.push_back(Pair("propertyid", (uint64_t) propertyId));
