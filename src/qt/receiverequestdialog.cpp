@@ -22,7 +22,11 @@
 #endif
 
 #if defined(HAVE_CONFIG_H)
-#include "config/bitcoin-config.h" /* for USE_QRCODE */
+#ifdef _WIN32
+#include "config/bitcoin-configWin.h"
+#else
+#include "config/bitcoin-config.h"
+#endif /* for USE_QRCODE */
 #endif
 
 #ifdef USE_QRCODE

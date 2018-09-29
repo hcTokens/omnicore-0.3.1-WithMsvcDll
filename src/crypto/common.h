@@ -6,7 +6,11 @@
 #define BITCOIN_CRYPTO_COMMON_H
 
 #if defined(HAVE_CONFIG_H)
-#include "bitcoin-config.h"
+#ifdef _WIN32
+#include "config/bitcoin-configWin.h"
+#else
+#include "config/bitcoin-config.h"
+#endif
 #endif
 
 #include <stdint.h>

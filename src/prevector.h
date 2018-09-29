@@ -59,7 +59,7 @@ public:
         iterator operator++(int) { iterator copy(*this); ++(*this); return copy; }
         iterator operator--(int) { iterator copy(*this); --(*this); return copy; }
         difference_type friend operator-(iterator a, iterator b) { return (&(*a) - &(*b)); }
-		iterator operator+(size_type n) { return iterator(ptr + n); }
+        iterator operator+(size_type n) { return iterator(ptr + n); }
         iterator& operator+=(size_type n) { ptr += n; return *this; }
         iterator operator-(size_type n) { return iterator(ptr - n); }
         iterator& operator-=(size_type n) { ptr -= n; return *this; }

@@ -6,7 +6,11 @@
 #define BITCOIN_NETBASE_H
 
 #if defined(HAVE_CONFIG_H)
+#ifdef _WIN32
+#include "config/bitcoin-configWin.h"
+#else
 #include "config/bitcoin-config.h"
+#endif
 #endif
 
 #include "compat.h"

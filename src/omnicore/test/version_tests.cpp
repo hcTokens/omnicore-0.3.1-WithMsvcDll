@@ -1,6 +1,10 @@
 #include "omnicore/version.h"
 
+#ifdef _WIN32
+#include "config/bitcoin-configWin.h"
+#else
 #include "config/bitcoin-config.h"
+#endif
 #include "test/test_bitcoin.h"
 
 #include <boost/test/unit_test.hpp>

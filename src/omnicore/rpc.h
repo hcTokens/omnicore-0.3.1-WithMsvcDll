@@ -14,12 +14,10 @@
 #ifndef RPC_H
 #define RPC_H
 
-#include "omnicore/dbspinfo.h"
-
 /** Throws a JSONRPCError, depending on error code. */
 void PopulateFailure(int error);
 
-void PropertyToJSON(const CMPSPInfo::Entry& sProperty, UniValue& property_obj);
-UniValue omni_getbalance(const UniValue& params, bool fHelp);
+
+
 #endif /* RPC_H */
 

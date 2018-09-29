@@ -1,10 +1,8 @@
-#ifndef BITCOIN_BITCOIN_CONFIG_H
-#define BITCOIN_BITCOIN_CONFIG_H
+#ifndef BITCOIN_BITCOIN_CONFIG_H_WIN
+#define BITCOIN_BITCOIN_CONFIG_H_WIN
 
-#ifdef _WIN64
+#ifdef _WIN32
 typedef long long ssize_t;
-#else
-typedef int ssize_t;
 #endif
 
 // Increase with every consensus affecting change
@@ -78,7 +76,7 @@ typedef int ssize_t;
 #define HAVE_BOOST_UNIT_TEST_FRAMEWORK /**/
 
 /* Define to 1 if you have the <byteswap.h> header file. */
-/* #undef HAVE_BYTESWAP_H */
+#undef HAVE_BYTESWAP_H 
 
 /* Define this symbol if the consensus lib has been built */
 #define HAVE_CONSENSUS_LIB 1
@@ -178,7 +176,7 @@ typedef int ssize_t;
 /* #undef HAVE_DLFCN_H */
 
 /* Define to 1 if you have the <endian.h> header file. */
-/* #undef HAVE_ENDIAN_H */
+#undef HAVE_ENDIAN_H 
 
 /* Define to 1 if the system has the `dllexport' function attribute */
 #define HAVE_FUNC_ATTRIBUTE_DLLEXPORT 1
@@ -437,4 +435,4 @@ typedef int ssize_t;
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */
 
-#endif //BITCOIN_BITCOIN_CONFIG_H
+#endif //BITCOIN_BITCOIN_CONFIG_H_WIN

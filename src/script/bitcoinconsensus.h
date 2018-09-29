@@ -9,7 +9,11 @@
 #include <stdint.h>
 
 #if defined(BUILD_BITCOIN_INTERNAL) && defined(HAVE_CONFIG_H)
+#ifdef _WIN32
+#include "config/bitcoin-configWin.h"
+#else
 #include "config/bitcoin-config.h"
+#endif
   #if defined(_WIN32)
     #if defined(DLL_EXPORT)
       #if defined(HAVE_FUNC_ATTRIBUTE_DLLEXPORT)

@@ -809,10 +809,9 @@ bool CMPTxList::isMPinBlockRange(int starting_block, int ending_block, bool bDel
         if (2 <= vstr.size()) {
             block = atoi(vstr[1]);
 
-            if (starting_block <= block) {
+            if ((starting_block <= block) && (block <= ending_block)) {
                 ++n_found;
-                PrintToLog("%s() DELETING: %s=%s, blk height:%d\n", __func__, skey.ToString(), svalue.ToString(), block);
-                printf("%s() DELETING: %s=%s£¬blk height:%d\n", __func__, skey.ToString().c_str(), svalue.ToString().c_str(), block);
+                PrintToLog("%s() DELETING: %s=%s\n", __func__, skey.ToString(), svalue.ToString());
                 if (bDeleteFound) pdb->Delete(writeoptions, skey);
             }
         }
