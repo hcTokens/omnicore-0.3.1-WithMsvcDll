@@ -62,7 +62,7 @@ CMPSPInfo::CMPSPInfo(const boost::filesystem::path& path, bool fWipe)
     implied_omni.subcategory = "N/A";
     implied_omni.name = "Omni";
     implied_omni.url = "http://www.omnilayer.org";
-    implied_omni.data = "Omni serve as the binding between Bitcoin, smart properties and contracts created on the Omni Layer.";
+    implied_omni.data = "Omni serve as the binding between HC, smart properties and contracts created on the Omni Layer.";
     implied_tomni.issuer = ExodusAddress();
     implied_tomni.prop_type = MSC_PROPERTY_TYPE_DIVISIBLE;
     implied_tomni.num_tokens = 700000;
@@ -70,7 +70,7 @@ CMPSPInfo::CMPSPInfo(const boost::filesystem::path& path, bool fWipe)
     implied_tomni.subcategory = "N/A";
     implied_tomni.name = "Test Omni";
     implied_tomni.url = "http://www.omnilayer.org";
-    implied_tomni.data = "Test Omni serve as the binding between Bitcoin, smart properties and contracts created on the Omni Layer.";
+    implied_tomni.data = "Test Omni serve as the binding between HC, smart properties and contracts created on the Omni Layer.";
 
     init();
 }
