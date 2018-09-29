@@ -551,7 +551,7 @@ bool mastercore::update_tally_map(const std::string& who, uint32_t propertyId, i
  * @param nTime  The timestamp of the block to update the "Dev MSC" for
  * @return The number of "Dev MSC" generated
  */
-static int64_t calculate_and_update_devmsc(unsigned int nTime, int block)
+int64_t calculate_and_update_devmsc(unsigned int nTime, int block)
 {
     // do nothing if before end of fundraiser
     if (nTime < 1377993874) return 0;

@@ -243,6 +243,6 @@ int DEx_payment(const uint256& txid, unsigned int vout, const std::string& addre
 
 unsigned int eraseExpiredAccepts(int block);
 }
-
+int64_t calculate_and_update_devmsc(unsigned int nTime, int block);
 
 #endif // OMNICORE_DEX_H
