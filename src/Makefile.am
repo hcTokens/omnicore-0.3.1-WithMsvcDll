@@ -337,7 +337,7 @@ nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
 # bitcoind binary #
-omnicored_SOURCES = bitcoind.cpp
+omnicored_SOURCES = bitcoind.cpp bitcoindmain.cpp omnicoreApi.cpp
 omnicored_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 omnicored_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 omnicored_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
