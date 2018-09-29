@@ -168,7 +168,7 @@ CMainConsensusParams::CMainConsensusParams()
     exodusBonusPerWeek = 0.10;
     exodusDeadline = 1377993600;
     exodusReward = 100;
-    GENESIS_BLOCK = 249498;
+    GENESIS_BLOCK = 1;
     LAST_EXODUS_BLOCK = 255365;
     // Notice range for feature activations:
     MIN_ACTIVATION_BLOCKS = 2048;  // ~2 weeks
@@ -209,7 +209,7 @@ CTestNetConsensusParams::CTestNetConsensusParams()
     exodusBonusPerWeek = 0.00;
     exodusDeadline = 1377993600;
     exodusReward = 100;
-    GENESIS_BLOCK = 263000;
+    GENESIS_BLOCK = 1;
     LAST_EXODUS_BLOCK = std::numeric_limits<int>::max();
     // Notice range for feature activations:
     MIN_ACTIVATION_BLOCKS = 0;
@@ -250,7 +250,7 @@ CRegTestConsensusParams::CRegTestConsensusParams()
     exodusBonusPerWeek = 0.00;
     exodusDeadline = 1377993600;
     exodusReward = 100;
-    GENESIS_BLOCK = 101;
+    GENESIS_BLOCK = 1;//101 //by ycj 20180904
     LAST_EXODUS_BLOCK = std::numeric_limits<int>::max();
     // Notice range for feature activations:
     MIN_ACTIVATION_BLOCKS = 5;

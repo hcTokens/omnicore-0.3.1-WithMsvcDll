@@ -609,17 +609,13 @@ void NotifyTotalTokensChanged(uint32_t propertyId, int block)
 
 void CheckWalletUpdate(bool forceUpdate)
 {
-#ifdef ENABLE_WALLET
-    if (!pwalletMain) {
-        return;
-    }
-#endif
-
     // because the wallet balance cache is *only* used by the UI, it's not needed,
     // when the daemon is running without UI.
-    if (!fQtMode) {
-        return;
-    }
+    //if (!fQtMode) {
+    //    return;
+    //}
+
+	WalletCacheUpdate();
 
     if (!WalletCacheUpdate()) {
         // no balance changes were detected that affect wallet addresses, signal a generic change to overall Omni state
