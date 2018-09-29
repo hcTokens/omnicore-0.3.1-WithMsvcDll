@@ -965,6 +965,8 @@ extern CScript _createmultisig_redeemScript(const UniValue& params);
 
 UniValue addmultisigaddress(const UniValue& params, bool fHelp)
 {
+    throw runtime_error("not implement");//comment 20180929
+    /*
     if (!EnsureWalletIsAvailable(fHelp))
         return NullUniValue;
 
@@ -1009,6 +1011,7 @@ UniValue addmultisigaddress(const UniValue& params, bool fHelp)
 
     pwalletMain->SetAddressBook(innerID, strAccount, "send");
     return CBitcoinAddress(innerID).ToString();
+	*/
 }
 
 class Witnessifier : public boost::static_visitor<bool>

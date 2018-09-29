@@ -33,13 +33,15 @@ MYDLLAPI const char* JsonCmdReq(char* pcReq)
 
 typedef char* (*FunJsonCmdReqOmToHc)(char*);
 FunJsonCmdReqOmToHc gFunJsonCmdReqOmToHc;
-char* JsonCmdReqOmToHc(char* pcReq)
+#ifdef _WIN32
+char* JsonCmdReqOmToHc(char* pcReq)  //linux version is defined in omniSubCall_unix.go
 {
     if (gFunJsonCmdReqOmToHc == NULL)
         return NULL;
     char* pcRsp = gFunJsonCmdReqOmToHc(pcReq);
     return pcRsp;
 }
+#endif
 
 MYDLLAPI void SetCallback(unsigned int uiIndx, void* pJsonCmdReqOmToHc)
 { //	now just set one callback function,other may add later
