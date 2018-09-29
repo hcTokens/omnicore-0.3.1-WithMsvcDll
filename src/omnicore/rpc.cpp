@@ -2573,6 +2573,25 @@ UniValue omni_processpayment(const UniValue& params, bool fHelp)
 	return DEx_payment(vecTxHash, Idx, Sender, Reference, Amount, Block)? "fail" :"success";
 }
 
+UniValue omni_onblockconnected(const UniValue& params, bool fHelp)
+{
+    //Sender, Reference, Block, uint256(vecTxHash), Block, Idx, &(Script[0]), Script.size(), 3, Fee
+    int len = params.size();
+
+    if (fHelp || params.size() != 3)
+        throw runtime_error(
+            "omni_processpayment\n"
+            "\nExamples:\n" +
+            HelpExampleCli("omni_processpayment", "000000fff3d3322faddd"));
+
+	int64_t Block = params[0].get_int64();
+    uint256 BlockHash = uint256S(params[1].get_str());
+	int64_t Time = params[2].get_int64();
+
+	eraseExpiredAccepts(Block);
+	calculate_and_update_devmsc(Time, Block);
+	return "";
+}
 
 static const CRPCCommand commands[] =
 { //  category                             name                            actor (function)               okSafeMode
@@ -2608,6 +2627,7 @@ static const CRPCCommand commands[] =
     { "omni layer (data retrieval)", "omni_dealopreturn",              &omni_dealopreturn,               false },
 	{ "omni layer (data retrieval)", "omni_processtx",                 &omni_processtx,					 false },
 	{ "omni layer (data retrieval)", "omni_processpayment",            &omni_processpayment,			 false },
+	{ "omni layer (data retrieval)", "omni_onblockconnected",          &omni_onblockconnected,			 false },
 #ifdef ENABLE_WALLET
     { "omni layer (data retrieval)", "omni_listtransactions",          &omni_listtransactions,           false },
     { "omni layer (data retrieval)", "omni_getfeeshare",               &omni_getfeeshare,                false },
