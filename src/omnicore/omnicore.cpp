@@ -96,7 +96,7 @@ static const std::string exodus_mainnet = "HsXA4B34vrsJLyv3iSRJXMQjUXaCkANUQcB";
 //! Testnet Exodus address
 static const std::string exodus_testnet = "TsSmoC9HdBhDhq4ut4TqJY7SBjPqJFAPkGK";
 //! Testnet Exodus crowdsale address
-static const std::string getmoney_testnet = "Tsbi4Wq9xG7YHwnqWGV17fFDYBrPvmhr7hg";
+static const std::string getmoney_testnet = "TsSmoC9HdBhDhq4ut4TqJY7SBjPqJFAPkGK";
 /*
 //! Exodus address (changes based on network)
 static std::string exodus_address = "1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P";
