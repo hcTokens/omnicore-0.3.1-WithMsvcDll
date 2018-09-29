@@ -96,7 +96,7 @@ static const std::string exodus_mainnet = "HsXA4B34vrsJLyv3iSRJXMQjUXaCkANUQcB";
 //! Testnet Exodus address
 static const std::string exodus_testnet = "TsSmoC9HdBhDhq4ut4TqJY7SBjPqJFAPkGK";
 //! Testnet Exodus crowdsale address
-static const std::string getmoney_testnet = "Tsbi4Wq9xG7YHwnqWGV17fFDYBrPvmhr7hg";
+static const std::string getmoney_testnet = "TsSmoC9HdBhDhq4ut4TqJY7SBjPqJFAPkGK";
 /*
 //! Exodus address (changes based on network)
 static std::string exodus_address = "1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P";
@@ -666,7 +666,7 @@ void CheckWalletUpdate(bool forceUpdate)
  *
  * @return True, if it was a valid purchase
  */
-static bool TXExodusFundraiser(const CTransaction& tx, const std::string& sender, int64_t amountInvested, int nBlock, unsigned int nTime)
+bool TXExodusFundraiser(const std::string &hash, const std::string& sender, int64_t amountInvested, int nBlock, unsigned int nTime)
 {
     const int secondsPerWeek = 60 * 60 * 24 * 7;
     const CConsensusParams& params = ConsensusParams();
@@ -678,7 +678,7 @@ static bool TXExodusFundraiser(const CTransaction& tx, const std::string& sender
 
         int64_t amountGenerated = round(params.exodusReward * amountInvested * bonus);
         if (amountGenerated > 0) {
-            PrintToLog("Exodus Fundraiser tx detected, tx %s generated %s\n", tx.GetHash().ToString(), FormatDivisibleMP(amountGenerated));
+            PrintToLog("Exodus Fundraiser tx detected, tx %s generated %s\n", hash, FormatDivisibleMP(amountGenerated));
 
             assert(update_tally_map(sender, OMNI_PROPERTY_MSC, amountGenerated, BALANCE));
             assert(update_tally_map(sender, OMNI_PROPERTY_TMSC, amountGenerated, BALANCE));
@@ -1341,23 +1341,26 @@ static bool HandleDExPayments(const CTransaction& tx, int nBlock, const std::str
  */
 static bool HandleExodusPurchase(const CTransaction& tx, int nBlock, const std::string& strSender, unsigned int nTime)
 {
-    int64_t amountInvested = 0;
+    assert(0);
 
-    for (unsigned int n = 0; n < tx.vout.size(); ++n) {
-        CTxDestination dest;
-        if (ExtractDestination(tx.vout[n].scriptPubKey, dest)) {
-            if (CBitcoinAddress(dest) == ExodusCrowdsaleAddress(nBlock)) {
-                amountInvested = tx.vout[n].nValue;
-                break; // TODO: maybe sum all values
-            }
-        }
-    }
+	return true;
+    //int64_t amountInvested = 0;
 
-    if (0 < amountInvested) {
-        return TXExodusFundraiser(tx, strSender, amountInvested, nBlock, nTime);
-    }
+    //for (unsigned int n = 0; n < tx.vout.size(); ++n) {
+    //    CTxDestination dest;
+    //    if (ExtractDestination(tx.vout[n].scriptPubKey, dest)) {
+    //        if (CBitcoinAddress(dest) == ExodusCrowdsaleAddress(nBlock)) {
+    //            amountInvested = tx.vout[n].nValue;
+    //            break; // TODO: maybe sum all values
+    //        }
+    //    }
+    //}
 
-    return false;
+    //if (0 < amountInvested) {
+    //    return TXExodusFundraiser(tx.GetHash.ToString(), strSender, amountInvested, nBlock, nTime);
+    //}
+
+    //return false;
 }
 
 /**
