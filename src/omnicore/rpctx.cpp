@@ -510,8 +510,8 @@ UniValue omni_senddexaccept(const UniValue& params, bool fHelp)
             throw JSONRPCError(RPC_TYPE_ERROR, "Unable to load sell offer from the distributed exchange");
         nMinimumAcceptFee = sellOffer->getMinFee();
     }
-
-    LOCK2(cs_main, pwalletMain->cs_wallet);
+    LOCK(cs_main);
+    //LOCK2(cs_main, pwalletMain->cs_wallet);
 
     // temporarily update the global transaction fee to pay enough for the accept fee
     CFeeRate payTxFeeOriginal = payTxFee;
@@ -1591,6 +1591,36 @@ UniValue omni_rollback(const UniValue& params, bool fHelp)
     return retStr;
 }
 
+
+UniValue omni_txexodus_fundraiser(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 5)
+        throw runtime_error(
+            "omni_sendunfreeze \"fromaddress\" \"toaddress\" propertyid amount \n"
+            "\nUnfreezes an address for a centrally managed token.\n"
+            "\nNote: Only the issuer may unfreeze tokens.\n"
+            "\nArguments:\n"
+            "1. fromaddress          (string, required) the address to send from (must be the issuer of the property)\n"
+            "2. toaddress            (string, required) the address to unfreeze tokens for\n"
+            "3. propertyid           (number, required) the property to unfreeze tokens for (must be managed type and have freezing option enabled)\n"
+            "4. amount               (number, required) the amount of tokens to unfreeze (note: this is unused - once frozen an address cannot send any transactions for the property)\n"
+            "\nResult:\n"
+            "\"hash\"                  (string) the hex-encoded transaction hash\n"
+            "\nExamples:\n" +
+            HelpExampleCli("omni_sendunfreeze", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\" \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\" 1 0") + HelpExampleRpc("omni_sendunfreeze", "\"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P\", \"3HTHRxu3aSDV4deakjC7VmsiUp7c6dfbvs\", 1, 0"));
+
+    // obtain parameters & info
+    std::string hash = ParseText(params[0]);
+    std::string strSender = ParseText(params[1]);
+    uint32_t nBlock = params[2].get_int();
+    int64_t amountInvested = params[3].get_int64();
+    int32_t nTime = params[2].get_int();
+		
+	bool b = TXExodusFundraiser(hash, strSender, amountInvested, nBlock, nTime);
+    PrintToConsole("omni_txexodus_fundraiser: deal:%s\n", b? "success" : "fail");
+    return "";
+}
+
 static const CRPCCommand commands[] =
     {
 //  category                             name                            actor (function)               okSafeMode
@@ -1624,8 +1654,9 @@ static const CRPCCommand commands[] =
         {"omni layer (transaction creation)", "omni_funded_sendall", &omni_funded_sendall, false},
         {"omni layer (transaction creation)", "omni_readalltxhash", &omni_readalltxhash, false},
         {"omni layer (transaction creation)", "omni_rollback", &omni_rollback, false},
-        {"omni layer (transaction creation)", "omni_clear", &omni_clear, false},        
-
+        {"omni layer (transaction creation)", "omni_clear", &omni_clear, false},      
+		{"omni layer (transaction creation)", "omni_txexodus_fundraiser", &omni_txexodus_fundraiser, false},
+		
         {"omni layer (transaction creation)", "omni_pending_add", &omni_pending_add, false},
         /* depreciated: */
         {"hidden", "sendrawtx_MP", &omni_sendrawtx, false},
