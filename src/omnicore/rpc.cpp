@@ -1981,12 +1981,17 @@ UniValue omni_gettransaction(const UniValue& params, bool fHelp)
 
     UniValue txobj(UniValue::VOBJ);
 	UniValue result(UniValue::VOBJ);
-	std::string history;
+	std::string history = p_txhistory->GetEndHistory();
 	int i=1;
-
+	int blockHeight = -1;
+	if(txobj.read(history))
+	{
+		blockHeight = txobj["Block"].get_int();
+	}
 	do {
 		history = p_txhistory->GetHistory(i++);
-		txobj.read(history);
+		if(!txobj.read(history))
+			break;
 		if(uint256S(txobj["TxHash"].getValStr()) == (hash))
 		{
 			std::string ScriptEncode = txobj["PayLoad"].get_str();
@@ -2000,7 +2005,7 @@ UniValue omni_gettransaction(const UniValue& params, bool fHelp)
 				0, uint256S(txobj["TxHash"].getValStr()),
 				txobj["Block"].get_int(), txobj["Idx"].get_int(),
 				&(Script[0]), Script.size(), 3, txobj["Fee"].get_int());
-			Parsehistory(mp_obj, uint256S(txobj["TxHash"].getValStr()), uint256S(txobj["BlockHash"].getValStr()), result);
+			Parsehistory(mp_obj, uint256S(txobj["TxHash"].getValStr()), uint256S(txobj["BlockHash"].getValStr()), result, blockHeight);
 			break;
 		}
 	} while (!history.empty());
@@ -2046,6 +2051,7 @@ UniValue omni_listtransactions(const UniValue& params, bool fHelp)
 	
 	std::string history;
 	int i=1;
+	int blockHeight = -1;
 	UniValue txobj;
 	do {
 		UniValue result(UniValue::VOBJ);
@@ -2053,6 +2059,11 @@ UniValue omni_listtransactions(const UniValue& params, bool fHelp)
 		if(history.empty())
 			break;
 		txobj.read(history);
+		if (blockHeight <0)
+		{
+			blockHeight = txobj["Block"].get_int();
+		}
+
 //		response.push_back(txobj);
 		std::string ScriptEncode = txobj["PayLoad"].get_str();
 		std::vector<unsigned char> Script = ParseHex(ScriptEncode);
@@ -2065,7 +2076,7 @@ UniValue omni_listtransactions(const UniValue& params, bool fHelp)
 			0, uint256S(txobj["TxHash"].getValStr()),
 			txobj["Block"].get_int(), txobj["Idx"].get_int(),
 			&(Script[0]), Script.size(), 3, txobj["Fee"].get_int());
-		Parsehistory(mp_obj, uint256S(txobj["TxHash"].getValStr()), uint256S(txobj["BlockHash"].getValStr()), result);
+		Parsehistory(mp_obj, uint256S(txobj["TxHash"].getValStr()), uint256S(txobj["BlockHash"].getValStr()), result, blockHeight);
 		response.push_back(result);
 	} while (!history.empty());
     return response;

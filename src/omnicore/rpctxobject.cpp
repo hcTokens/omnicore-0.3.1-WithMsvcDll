@@ -191,11 +191,24 @@ int populateRPCTransactionObject(const CTransaction& tx, const uint256& blockHas
     return 0;
 }
 
-int Parsehistory(CMPTransaction& mp_obj, const uint256& txid, const uint256& blockHash, UniValue& txobj, std::string filterAddress, bool extendedDetails, std::string extendedDetailsFilter, int blockHeight)
+int Parsehistory(CMPTransaction& mp_obj, const uint256& txid, const uint256& blockHash, UniValue& txobj, int blockHeight, std::string filterAddress, bool extendedDetails, std::string extendedDetailsFilter)
 {
-    int confirmations = 0;
+    int confirmations = blockHeight + 1 - mp_obj.getCurrentBlock();
     int64_t blockTime = 0;
     int positionInBlock = 0;
+
+	//if (blockHeight == 0) {
+ //       blockHeight = GetHeight();
+ //   }
+
+ //   if (!blockHash.IsNull()) {
+ //       CBlockIndex* pBlockIndex = GetBlockIndex(blockHash);
+ //       if (NULL != pBlockIndex) {
+ //           confirmations = 1 + blockHeight - pBlockIndex->nHeight;
+ //           blockTime = pBlockIndex->nTime;
+ //           blockHeight = pBlockIndex->nHeight;
+ //       }
+ //   }
 
     // attempt to parse the transaction
 
@@ -269,7 +282,7 @@ int Parsehistory(CMPTransaction& mp_obj, const uint256& txid, const uint256& blo
             txobj.push_back(Pair("invalidreason", p_OmniTXDB->FetchInvalidReason(txid)));
         }
         txobj.push_back(Pair("blockhash", blockHash.GetHex()));
-        txobj.push_back(Pair("blocktime", blockTime));
+        txobj.push_back(Pair("blocktime", mp_obj.getBlockTime()));
         txobj.push_back(Pair("positioninblock", positionInBlock));
     }
     if (confirmations != 0) {
