@@ -1980,7 +1980,7 @@ UniValue omni_gettransaction(const UniValue& params, bool fHelp)
     uint256 hash = ParseHashV(params[0], "txid");
 
     UniValue txobj(UniValue::VOBJ);
-
+	UniValue result(UniValue::VOBJ);
 	std::string history;
 	int i=1;
 
@@ -1989,10 +1989,22 @@ UniValue omni_gettransaction(const UniValue& params, bool fHelp)
 		txobj.read(history);
 		if(uint256S(txobj["TxHash"].getValStr()) == (hash))
 		{
+			std::string ScriptEncode = txobj["PayLoad"].get_str();
+			std::vector<unsigned char> Script = ParseHex(ScriptEncode);
+
+			CMPTransaction mp_obj;
+			mp_obj.unlockLogic();
+			mp_obj.Set(uint256S(txobj["TxHash"].getValStr()), txobj["Block"].get_int(), txobj["Idx"].get_int(), txobj["Time"].get_int64());
+			mp_obj.SetBlockHash(uint256S(txobj["BlockHash"].getValStr()));
+			mp_obj.Set(txobj["Sender"].getValStr(),	txobj["Reference"].getValStr(),
+				0, uint256S(txobj["TxHash"].getValStr()),
+				txobj["Block"].get_int(), txobj["Idx"].get_int(),
+				&(Script[0]), Script.size(), 3, txobj["Fee"].get_int());
+			Parsehistory(mp_obj, uint256S(txobj["TxHash"].getValStr()), uint256S(txobj["BlockHash"].getValStr()), result);
 			break;
 		}
 	} while (!history.empty());
-    return txobj;
+    return result;
 }
 
 UniValue omni_listtransactions(const UniValue& params, bool fHelp)
@@ -2031,15 +2043,30 @@ UniValue omni_listtransactions(const UniValue& params, bool fHelp)
         );
 
 	UniValue response(UniValue::VARR);
+	
 	std::string history;
 	int i=1;
 	UniValue txobj;
 	do {
+		UniValue result(UniValue::VOBJ);
 		history = p_txhistory->GetHistory(i++);
 		if(history.empty())
 			break;
 		txobj.read(history);
-		response.push_back(txobj);
+//		response.push_back(txobj);
+		std::string ScriptEncode = txobj["PayLoad"].get_str();
+		std::vector<unsigned char> Script = ParseHex(ScriptEncode);
+
+		CMPTransaction mp_obj;
+		mp_obj.unlockLogic();
+		mp_obj.Set(uint256S(txobj["TxHash"].getValStr()), txobj["Block"].get_int(), txobj["Idx"].get_int(), txobj["Time"].get_int64());
+		mp_obj.SetBlockHash(uint256S(txobj["BlockHash"].getValStr()));
+		mp_obj.Set(txobj["Sender"].getValStr(),	txobj["Reference"].getValStr(),
+			0, uint256S(txobj["TxHash"].getValStr()),
+			txobj["Block"].get_int(), txobj["Idx"].get_int(),
+			&(Script[0]), Script.size(), 3, txobj["Fee"].get_int());
+		Parsehistory(mp_obj, uint256S(txobj["TxHash"].getValStr()), uint256S(txobj["BlockHash"].getValStr()), result);
+		response.push_back(result);
 	} while (!history.empty());
     return response;
 }
